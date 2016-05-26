@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="0dp"
+    android:paddingLeft="0dp"
+    android:paddingRight="0dp"
+    android:paddingTop="0dp"
+    tools:context="com.example.errand.errand.MainActivity"
+    android:baselineAligned="false">
+
+
+
+
+    <LinearLayout
+        android:id="@+id/bottom_guide"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/list"
+            android:background="@drawable/tab_bg"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:drawablePadding="3dp"
+            android:drawableTop="@drawable/tab_tasklist"
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="@string/task_list"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/rank"
+            android:background="@drawable/tab_bg"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:drawablePadding="3dp"
+            android:drawableTop="@drawable/tab_userrank"
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="@string/user_rank"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/info"
+            android:background="@drawable/tab_bg"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:drawablePadding="3dp"
+            android:drawableTop="@drawable/tab_userinfo"
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="@string/user_info"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/div_tab_bar"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@drawable/divide_bar"
+        android:layout_above="@id/bottom_guide"/>
+
+
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/div_tab_bar"
+        android:id="@+id/content">
+
+    </FrameLayout>
+
+</RelativeLayout>

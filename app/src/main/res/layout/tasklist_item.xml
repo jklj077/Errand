@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:weightSum="1">
+
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="80dp"
+        android:padding="5dp">
+
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="fill_parent"
+            android:id="@+id/imageView"
+            android:src="@drawable/tab_userinfo"
+            android:layout_marginRight="10dp" />
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/task_item_content"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="求帮忙取快递！！！"
+                android:textColor="#000000"
+                android:textSize="22sp"
+                android:layout_margin="4dp" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_gravity="center_horizontal"
+                android:padding="0dp"
+                android:layout_margin="2dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="userA"
+                    android:textColor="#000000"
+                    android:textSize="18sp"
+                    android:id="@+id/task_item_person"
+                    android:layout_margin="2dp" />
+
+                <TextView
+                    android:id="@+id/task_item_pay"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="    5RMB"
+                    android:layout_margin="2dp" />
+            </LinearLayout>;
+                android:id="@+id/textView3" />
+
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

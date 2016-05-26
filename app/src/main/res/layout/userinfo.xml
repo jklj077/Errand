@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/task_list"
+        android:minWidth="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="#91dadf"
+        android:clickable="false">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/user_info"
+            android:id="@+id/textView2"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:textSize="20sp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/relativeLayout2"
+        android:paddingBottom="10dp"
+        android:background="#aae3f3"
+        android:layout_below="@+id/task_list"
+        android:layout_alignParentLeft="true">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentTop="true"
+            android:id="@+id/user">
+
+            <ImageView
+                android:layout_width="fill_parent"
+                android:layout_height="60dp"
+                android:id="@+id/imageView2"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="20dp"
+                android:src="@mipmap/user2" />
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="PersonA"
+                android:id="@+id/textView4"
+                android:layout_below="@+id/imageView2"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
+                android:textSize="18sp"
+                android:gravity="center_horizontal" />
+        </LinearLayout>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/relativeLayout2"
+        android:layout_alignParentLeft="true"
+        android:id="@+id/l1">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:text="发布新任务"
+            android:drawableRight="@drawable/right"
+            android:id="@+id/create_task"
+            android:textSize="24dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp" />
+    </LinearLayout>
+    <View
+        android:id="@+id/div_tab_bar1"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@drawable/divide_bar"
+        android:layout_below="@id/l1"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/div_tab_bar1"
+        android:layout_alignParentLeft="true"
+        android:id="@+id/l2">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:text="已发布任务"
+            android:drawableRight="@drawable/right"
+            android:id="@+id/posted_task"
+            android:textSize="24dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp" />
+    </LinearLayout>
+    <View
+        android:id="@+id/div_tab_bar2"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@drawable/divide_bar"
+        android:layout_below="@id/l2"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/div_tab_bar2"
+        android:layout_alignParentLeft="true"
+        android:id="@+id/l3">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:text="已领取任务"
+            android:drawableRight="@drawable/right"
+            android:id="@+id/taken_task"
+            android:textSize="24dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp" />
+    </LinearLayout>
+    <View
+        android:id="@+id/div_tab_bar3"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@drawable/divide_bar"
+        android:layout_below="@id/l3"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/div_tab_bar3"
+        android:layout_alignParentLeft="true"
+        android:id="@+id/l4">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:text="过往任务"
+            android:drawableRight="@drawable/right"
+            android:id="@+id/past_task"
+            android:textSize="24dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp" />
+    </LinearLayout>
+    <View
+        android:id="@+id/div_tab_bar4"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@drawable/divide_bar"
+        android:layout_below="@id/l4"/>
+
+
+
+</RelativeLayout>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/title"
+        android:minWidth="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="#91dadf"
+        android:clickable="false">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/user_rank"
+            android:id="@+id/textView2"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:textSize="20sp" />
+    </RelativeLayout>
+
+    <ListView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/ranklist_listview"
+        android:layout_below="@+id/title"
+        android:layout_alignParentLeft="true" />
+
+
+</RelativeLayout>
