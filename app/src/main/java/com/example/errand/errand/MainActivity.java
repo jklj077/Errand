@@ -11,20 +11,20 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.view.Window;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private TextView list;
     private TextView rank;
     private TextView info;
     private FrameLayout frame;
 
-    private tasklist frame_list;
-    private rank frame_rank;
-    private userinfo frame_info;
+    private MainTaskListFragment frame_list;
+    private MainRankListFragment frame_rank;
+    private MainUserInfoFragment frame_info;
     private FragmentManager framemanager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,10 +33,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         actionBar.hide();
         setContentView(R.layout.activity_main);
 
-        framemanager=getFragmentManager();
+        framemanager = getFragmentManager();
         bindViews();
         list.performClick();
-
     }
 
     private void bindViews() {
@@ -50,50 +49,50 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    private void setSelected(){
+    private void setSelected() {
         list.setSelected(false);
         rank.setSelected(false);
         info.setSelected(false);
     }
 
-    private void hideAllFragment(FragmentTransaction fragmentTransaction){
-        if(frame_list != null)fragmentTransaction.hide(frame_list);
-        if(frame_rank != null)fragmentTransaction.hide(frame_rank);
-        if(frame_info != null)fragmentTransaction.hide(frame_info);
+    private void hideAllFragment(FragmentTransaction fragmentTransaction) {
+        if (frame_list != null) fragmentTransaction.hide(frame_list);
+        if (frame_rank != null) fragmentTransaction.hide(frame_rank);
+        if (frame_info != null) fragmentTransaction.hide(frame_info);
     }
 
     @Override
     public void onClick(View v) {
         FragmentTransaction fTransaction = framemanager.beginTransaction();
         hideAllFragment(fTransaction);
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.list:
                 setSelected();
                 list.setSelected(true);
-                if(frame_list == null){
-                    frame_list = new tasklist();
-                    fTransaction.add(R.id.content,frame_list);
-                }else{
+                if (frame_list == null) {
+                    frame_list = new MainTaskListFragment();
+                    fTransaction.add(R.id.content, frame_list);
+                } else {
                     fTransaction.show(frame_list);
                 }
                 break;
             case R.id.rank:
                 setSelected();
                 rank.setSelected(true);
-                if(frame_rank == null){
-                    frame_rank = new rank();
-                    fTransaction.add(R.id.content,frame_rank);
-                }else{
+                if (frame_rank == null) {
+                    frame_rank = new MainRankListFragment();
+                    fTransaction.add(R.id.content, frame_rank);
+                } else {
                     fTransaction.show(frame_rank);
                 }
                 break;
             case R.id.info:
                 setSelected();
                 info.setSelected(true);
-                if(frame_info == null){
-                    frame_info = new userinfo();
-                    fTransaction.add(R.id.content,frame_info);
-                }else{
+                if (frame_info == null) {
+                    frame_info = new MainUserInfoFragment();
+                    fTransaction.add(R.id.content, frame_info);
+                } else {
                     fTransaction.show(frame_info);
                 }
                 break;

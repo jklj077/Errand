@@ -6,15 +6,10 @@
 package com.example.errand.errand;
 
 import android.app.Activity;
-import android.os.Bundle;
-import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -23,7 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class nofragment_tasklist extends Activity {
+public class UserInfoTaskListActivity extends Activity {
 
     private int item_num=20;
     private ListView listview;
@@ -63,7 +58,7 @@ public class nofragment_tasklist extends Activity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Map<String, String> map = (Map<String, String>)  mSchedule.getItem(i);
                 String temp = map.get("task_item_content");
-                Intent intent = new Intent(nofragment_tasklist.this,task_info.class);
+                Intent intent = new Intent(UserInfoTaskListActivity.this, TaskInfoDetailActivity.class);
                 startActivityForResult(intent,0);
             }
         });
