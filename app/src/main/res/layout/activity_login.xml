@@ -29,7 +29,8 @@
         android:layout_below="@+id/textView"
         android:layout_marginTop="180dp"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true">
+        android:layout_centerHorizontal="true"
+        android:id="@+id/linearLayout2">
 
         <EditText
             android:layout_width="wrap_content"
@@ -37,7 +38,7 @@
             android:inputType="textPersonName"
             android:ems="10"
             android:id="@+id/username"
-            android:hint="@string/user_name"/>
+            android:hint="@string/user_name" />
 
         <EditText
             android:layout_width="wrap_content"
@@ -47,19 +48,62 @@
             android:id="@+id/password"
             android:hint="@string/example_password" />
 
-        <Button
-            android:layout_width="140dp"
+        <ProgressBar
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/land"
-            android:id="@+id/land"
+            android:id="@+id/progressBar"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="20dp" />
+            android:indeterminate="true"
+            android:indeterminateOnly="true"
+            android:visibility="invisible"
+            android:layout_marginTop="10dp" />
 
-        <Button
-            android:layout_width="140dp"
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/register"
-            android:id="@+id/register"
-            android:layout_gravity="center_horizontal"/>
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/land"
+                android:id="@+id/land"
+                android:layout_gravity="center_horizontal" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/register"
+                android:id="@+id/register"
+                android:layout_marginLeft="40dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/validateLayout"
+            android:visibility="invisible">
+
+            <EditText
+                android:layout_width="92dp"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:ems="10"
+                android:id="@+id/validateCode"
+                android:hint="@string/example_validateCode" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/validate"
+                android:id="@+id/validate"
+                android:layout_marginLeft="40dp" />
+        </LinearLayout>
+
     </LinearLayout>
+
 </RelativeLayout>

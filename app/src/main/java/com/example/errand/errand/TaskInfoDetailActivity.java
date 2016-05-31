@@ -12,14 +12,22 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.CookieHandler;
+import java.net.CookieManager;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -40,6 +48,7 @@ public class TaskInfoDetailActivity extends Activity {
     private ListView user_list;
     private ArrayList<HashMap<String, String>> mylist;
     private int usernum;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,6 +125,7 @@ public class TaskInfoDetailActivity extends Activity {
         添加任务条目类
         */
     public static class UserAddTaskActionTask extends AsyncTask<Void, Void, Boolean> {
+        CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
         private final String mPk;//这个是任务的pk号
         private final String mStart_time;//格式：2016-10-11 13:00:00
         private final String mEnd_time;
@@ -178,7 +188,7 @@ public class TaskInfoDetailActivity extends Activity {
 
         @Override
         protected void onPostExecute(final Boolean success) {
-            mAddTaskActionTask = null;
+            //mAddTaskActionTask = null;
             if (success) {
                 try {
                     JSONArray jsonArray = new JSONArray(result);
@@ -210,7 +220,7 @@ public class TaskInfoDetailActivity extends Activity {
 
         @Override
         protected void onCancelled() {
-            mAddTaskActionTask = null;
+            //mAddTaskActionTask = null;
         }
     }
 
@@ -218,6 +228,7 @@ public class TaskInfoDetailActivity extends Activity {
         添加任务类
         */
     public static class UserAddtaskTask extends AsyncTask<Void, Void, Boolean> {
+        CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
         private final String mHeadline;//标题
         private final String mDetail;//内容
         private final String mReward;//奖励
@@ -281,7 +292,7 @@ public class TaskInfoDetailActivity extends Activity {
 
         @Override
         protected void onPostExecute(final Boolean success) {
-            mAddtaskTask = null;
+            //mAddtaskTask = null;
             if (success) {
                 try {
                     JSONArray jsonArray = new JSONArray(result);
@@ -331,7 +342,7 @@ public class TaskInfoDetailActivity extends Activity {
 
         @Override
         protected void onCancelled() {
-            mAddtaskTask = null;
+            //mAddtaskTask = null;
         }
     }
 
@@ -340,6 +351,7 @@ public class TaskInfoDetailActivity extends Activity {
         与添加任务条目类似，注意需要任务条目的编号
         */
     public static class UserChangeTaskActionTask extends AsyncTask<Void, Void, Boolean> {
+        CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
         private final String mPk;//这个是TaskAction的pk号
         private final String mStart_time;
         private final String mEnd_time;
@@ -402,7 +414,7 @@ public class TaskInfoDetailActivity extends Activity {
 
         @Override
         protected void onPostExecute(final Boolean success) {
-            mChangeTaskActionTask = null;
+            //mChangeTaskActionTask = null;
             if (success) {
                 try {
                     JSONArray jsonArray = new JSONArray(result);
@@ -434,7 +446,7 @@ public class TaskInfoDetailActivity extends Activity {
 
         @Override
         protected void onCancelled() {
-            mChangeTaskActionTask = null;
+            //mChangeTaskActionTask = null;
         }
     }
 
@@ -442,6 +454,7 @@ public class TaskInfoDetailActivity extends Activity {
         修改任务类，与添加任务类基本类似，只是需要指定任务编号pk
         */
     public static class UserChangetaskTask extends AsyncTask<Void, Void, Boolean> {
+        CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
         private final String mPk;
         private final String mHeadline;
         private final String mDetail;
@@ -507,7 +520,7 @@ public class TaskInfoDetailActivity extends Activity {
 
         @Override
         protected void onPostExecute(final Boolean success) {
-            mChangetaskTask = null;
+            //mChangetaskTask = null;
 
             if (success) {
                 try {
@@ -559,7 +572,7 @@ public class TaskInfoDetailActivity extends Activity {
 
         @Override
         protected void onCancelled() {
-            mChangetaskTask = null;
+            //mChangetaskTask = null;
         }
     }
 
@@ -568,6 +581,7 @@ public class TaskInfoDetailActivity extends Activity {
         任务发布者将任务关闭
         */
     public static class UserClosetaskTask extends AsyncTask<Void, Void, Boolean> {
+        CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
         private final String mPk;//这个是任务的pk号
         PrintWriter out = null;
         BufferedReader in = null;
@@ -616,7 +630,7 @@ public class TaskInfoDetailActivity extends Activity {
 
         @Override
         protected void onPostExecute(final Boolean success) {
-            mClosetaskTask = null;
+            //mClosetaskTask = null;
             if (success) {
                 System.out.println("Close Task succeed");
             } else {
@@ -626,7 +640,7 @@ public class TaskInfoDetailActivity extends Activity {
 
         @Override
         protected void onCancelled() {
-            mClosetaskTask = null;
+            //mClosetaskTask = null;
         }
     }
 
@@ -635,6 +649,7 @@ public class TaskInfoDetailActivity extends Activity {
         发布者评价任务的完成状况并打分
         */
     public static class UserCommenttaskTask extends AsyncTask<Void, Void, Boolean> {
+        CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
         private final String mPk;//这个是任务的pk号
         private final String mScore;//打分 目前范围是1-5
         private final String mComment;//评价
@@ -687,7 +702,7 @@ public class TaskInfoDetailActivity extends Activity {
 
         @Override
         protected void onPostExecute(final Boolean success) {
-            mCommenttaskTask = null;
+            //mCommenttaskTask = null;
             if (success) {
                 System.out.println("Comment Task succeed");
             } else {
@@ -697,7 +712,7 @@ public class TaskInfoDetailActivity extends Activity {
 
         @Override
         protected void onCancelled() {
-            mCommenttaskTask = null;
+            //mCommenttaskTask = null;
         }
     }
 
@@ -705,6 +720,7 @@ public class TaskInfoDetailActivity extends Activity {
         删除任务条目类，需要任务条目的编号
         */
     public static class UserRemoveTaskActionTask extends AsyncTask<Void, Void, Boolean> {
+        CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
         private final String mPk;//TaskAction的pk号
         PrintWriter out = null;
         BufferedReader in = null;
@@ -753,7 +769,7 @@ public class TaskInfoDetailActivity extends Activity {
 
         @Override
         protected void onPostExecute(final Boolean success) {
-            mRemoveTaskActionTask = null;
+            //mRemoveTaskActionTask = null;
             if (success) {
                 System.out.println("RemoveTaskAction succeed");
             } else {
@@ -763,7 +779,7 @@ public class TaskInfoDetailActivity extends Activity {
 
         @Override
         protected void onCancelled() {
-            mRemoveTaskActionTask = null;
+            //mRemoveTaskActionTask = null;
         }
     }
 
@@ -771,6 +787,7 @@ public class TaskInfoDetailActivity extends Activity {
         删除任务类，只需要指定任务编号
         */
     public static class UserRemovetaskTask extends AsyncTask<Void, Void, Boolean> {
+        CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
         private final String mPk;
         PrintWriter out = null;
         BufferedReader in = null;
@@ -819,7 +836,7 @@ public class TaskInfoDetailActivity extends Activity {
 
         @Override
         protected void onPostExecute(final Boolean success) {
-            mRemovetaskTask = null;
+            //mRemovetaskTask = null;
             if (success) {
                 System.out.println("Remove Task succeed");
             } else {
@@ -829,7 +846,7 @@ public class TaskInfoDetailActivity extends Activity {
 
         @Override
         protected void onCancelled() {
-            mRemovetaskTask = null;
+            //mRemovetaskTask = null;
         }
     }
 
@@ -837,6 +854,7 @@ public class TaskInfoDetailActivity extends Activity {
         接受任务，需要被接受任务的编号
         */
     public static class UserResponsetaskTask extends AsyncTask<Void, Void, Boolean> {
+        CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
         private final String mPk;//这个是任务的pk号
         PrintWriter out = null;
         BufferedReader in = null;
@@ -885,7 +903,7 @@ public class TaskInfoDetailActivity extends Activity {
 
         @Override
         protected void onPostExecute(final Boolean success) {
-            mResponsetaskTask = null;
+            //mResponsetaskTask = null;
             if (success) {
                 System.out.println("Response Task succeed");
             } else {
@@ -895,7 +913,7 @@ public class TaskInfoDetailActivity extends Activity {
 
         @Override
         protected void onCancelled() {
-            mResponsetaskTask = null;
+            //mResponsetaskTask = null;
         }
     }
 
@@ -903,6 +921,7 @@ public class TaskInfoDetailActivity extends Activity {
         选择完成者类
         */
     public static class UserSelectTaskExecutorTask extends AsyncTask<Void, Void, Boolean> {
+        CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
         private final String mPk;//这个是任务的pk号
         private final String mUsername;
         PrintWriter out = null;
@@ -953,7 +972,7 @@ public class TaskInfoDetailActivity extends Activity {
 
         @Override
         protected void onPostExecute(final Boolean success) {
-            mSelectTaskExecutorTask = null;
+            //Object mSelectTaskExecutorTask = null;
             if (success) {
                 System.out.println("Select Task Executor succeed");
             } else {
@@ -963,7 +982,7 @@ public class TaskInfoDetailActivity extends Activity {
 
         @Override
         protected void onCancelled() {
-            mSelectTaskExecutorTask = null;
+            //mSelectTaskExecutorTask = null;
         }
     }
 }

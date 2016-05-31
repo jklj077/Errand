@@ -20,7 +20,11 @@
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
             android:textSize="20sp" />
+
+
+
     </RelativeLayout>
+
 
     <ListView
         android:layout_width="fill_parent"
@@ -28,6 +32,5 @@
         android:id="@+id/tasklist_listView"
         android:layout_below="@+id/task_list"
         android:layout_alignParentLeft="true" />
-
 
 </RelativeLayout>

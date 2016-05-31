@@ -20,7 +20,6 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.CookieHandler;
 import java.net.CookieManager;
@@ -30,7 +29,6 @@ import java.net.URLConnection;
 public class UserInfoDetailActivity extends Activity {
     private TextView back;
     private UserGetInfoTask mGetUserInfoTask;
-    private UserActiveTask mActiveTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,74 +128,4 @@ public class UserInfoDetailActivity extends Activity {
         }
     }
 
-    /*
-        用户激活类，用pku邮箱中的激活码激活，默认激活码为"1111"
-        */
-    public class UserActiveTask extends AsyncTask<Void, Void, Boolean> {
-        private final String mUsername;
-        private final String mPassword;
-        private final String mActivecode;
-        CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
-        PrintWriter out = null;
-        BufferedReader in = null;
-        String result = "";
-
-        UserActiveTask(String username, String password, String activecode) {
-            mUsername = username;
-            mPassword = password;
-            mActivecode = activecode;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            String strUrl = "http://139.129.47.180:8002/Errand/active";
-            URL Url = null;
-            try {
-                Url = new URL(strUrl);
-                URLConnection urlConnection = Url.openConnection();
-                System.out.println("Active");
-                if (msCookieManager.getCookieStore().getCookies().size() > 0) {
-                    System.out.println(msCookieManager.getCookieStore().getCookies());
-                    urlConnection.setRequestProperty("Cookie", TextUtils.join(";", msCookieManager.getCookieStore().getCookies()));
-                }
-                urlConnection.setConnectTimeout(5000);
-                urlConnection.setReadTimeout(5000);
-                urlConnection.setDoInput(true);
-                urlConnection.setDoOutput(true);
-                urlConnection.setUseCaches(false);
-                urlConnection.setRequestProperty("accept", "*/*");
-                urlConnection.setRequestProperty("connection", "Keep-Alive");
-                urlConnection.setRequestProperty("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
-                out = new PrintWriter(new OutputStreamWriter(urlConnection.getOutputStream(), "utf-8"));
-                String param = "username=" + mUsername + "&" + "password=" + mPassword + "&" + "activecode=" + mActivecode;
-                out.print(param);
-                out.flush();
-                in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-                String line;
-                while ((line = in.readLine()) != null) {
-                    result += line;
-                }
-                System.out.println("result = " + result);
-            } catch (Exception e) {
-                System.out.println("Active:发送POST请求出现异常！ " + e);
-                return false;
-            }
-            return result.equals("OK");
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            mActiveTask = null;
-            if (success) {
-                System.out.println("Active Succeed");
-            } else {
-                System.out.println("Active Failed");
-            }
-        }
-
-        @Override
-        protected void onCancelled() {
-            mActiveTask = null;
-        }
-    }
 }

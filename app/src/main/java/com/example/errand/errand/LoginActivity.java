@@ -1,8 +1,3 @@
-/*
-登录界面，初始打开它，对应的是activity_login.xml
-需要解决登陆和注册两个按钮事件
-*/
-
 package com.example.errand.errand;
 
 import android.content.Intent;
@@ -14,6 +9,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -29,57 +28,102 @@ import java.util.List;
 import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
-
-    GetRSAPublicKey mRSATask = null;
-    UserLoginTask mUserLoginTask = null;
-    UserRegisterTask mResTask = null;
-    String PublicKey = null;
+    private ProgressBar progressBar;
+    private Button land;
+    private Button register;
+    private EditText username;
+    private EditText password;
+    private LinearLayout validateLayout;
+    private Button validate;
+    private EditText validateCode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ActionBar actionBar = getSupportActionBar();
+        assert actionBar != null;
         actionBar.hide();
         setContentView(R.layout.activity_login);
 
-        Button button = (Button) findViewById(R.id.land);
-        button.setOnClickListener(new View.OnClickListener() {
+        CookieHandler.setDefault(new CookieManager());
+        new GetKey().execute();
+
+        SharedPreferences UserPassport = getSharedPreferences("User", MODE_PRIVATE);
+        String savedUsername = UserPassport.getString("username", null);
+        String savedPassword = UserPassport.getString("password", null);
+        if (savedUsername != null && savedPassword != null) {
+            new UserLogin(savedUsername, savedPassword).execute();
+        }
+
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        username = (EditText) findViewById(R.id.username);
+        password = (EditText) findViewById(R.id.password);
+        register = (Button) findViewById(R.id.register);
+        validate = (Button) findViewById(R.id.validate);
+        validateLayout = (LinearLayout) findViewById(R.id.validateLayout);
+        validateCode = (EditText) findViewById(R.id.validateCode);
+        land = (Button) findViewById(R.id.land);
+
+        land.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                startActivity(intent);
-                finish();
+                new UserLogin(username.getText().toString(), password.getText().toString()).execute();
             }
         });
 
-        CookieManager msCookieManager = new CookieManager();
-        //在本地读取cookie，需要在进入每个activity时读取
-        CookieHandler.setDefault(msCookieManager);
-        SharedPreferences cookies = getSharedPreferences("Cookie", 0);
-        String cookie = cookies.getString("Cookie", null);
+        register.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                new RegisterUser(username.getText().toString(), password.getText().toString()).execute();
+            }
+        });
 
-        if (cookie != null) {
-            msCookieManager.getCookieStore().add(null, HttpCookie.parse(cookie).get(0));
-            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-            startActivity(intent);
-            finish();
-        }
+        validate.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                new ActivateUser(username.getText().toString(), password.getText().toString(), validateCode.getText().toString()).execute();
+            }
+        });
 
     }
 
-    /*该类用于在登录前获取RSA公钥和cookie
-          其中加密和客户端的解密还未更新
-          除了该请求外，任何请求都必须带有cookie
-          所以建议在登录界面先生成该类的实例并运行*/
-    public class GetRSAPublicKey extends AsyncTask<Void, Void, Boolean> {
-        String result = "";
-        CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
-        BufferedReader in = null;
+    private void showToast(String content) {
+        Toast.makeText(getApplicationContext(), content, Toast.LENGTH_LONG).show();
+    }
 
-        protected Boolean doInBackground(Void... params) {
+    private void Froze(boolean froze) {
+        if (progressBar != null) {
+            progressBar.setVisibility(froze ? View.VISIBLE : View.INVISIBLE);
+        }
+        if (username != null) {
+            username.setEnabled(!froze);
+        }
+        if (password != null) {
+            password.setEnabled(!froze);
+        }
+        if (register != null) {
+            register.setEnabled(!froze);
+        }
+        if (land != null) {
+            land.setEnabled(!froze);
+        }
+        if (validate != null) {
+            validate.setEnabled(!froze);
+        }
+        if (validateCode != null) {
+            validateCode.setEnabled(!froze);
+        }
+    }
+
+    private class GetKey extends AsyncTask<Void, Void, String> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            Froze(true);
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
             String strUrl = "http://139.129.47.180:8002/Errand/";
-            URL Url = null;
+            URL Url;
             try {
                 Url = new URL(strUrl);
                 HttpURLConnection urlConnection = (HttpURLConnection) Url.openConnection();
@@ -93,66 +137,60 @@ public class LoginActivity extends AppCompatActivity {
                 urlConnection.setRequestProperty("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
                 Map<String, List<String>> headerFiles = urlConnection.getHeaderFields();
                 List<String> cookiesHeader = headerFiles.get("Set-Cookie");
-                SharedPreferences cookies = getSharedPreferences("Cookie", 0);
-                SharedPreferences.Editor editor = cookies.edit();
+                CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
                 if (cookiesHeader != null) {
                     for (String cookie : cookiesHeader) {
-                        System.out.println(cookie);
                         msCookieManager.getCookieStore().add(null, HttpCookie.parse(cookie).get(0));
-                        editor.putString("Cookie", cookie);
                     }
                 }
-                editor.commit();
-                in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
                 String line;
+                String result = "";
                 while ((line = in.readLine()) != null) {
                     result += line;
                 }
-                System.out.println("RSA result = " + result);
+                return result;
             } catch (Exception e) {
-                System.out.println("请求异常 " + e);
-                return false;
+                return "FAILED: " + e.toString();
             }
-            return true;
-        }
-
-        protected void onPostExecute(final Boolean success) {
-            mRSATask = null;
-            if (success) {
-                int l = result.indexOf("(");
-                int r = result.indexOf(")");
-                PublicKey = result.substring(l + 1, r);//PublicKey为获得的公钥，全局变量
-                System.out.println("PublicKey = " + PublicKey);
-            }
-        }
-
-        protected void onCancelled() {
-            mRSATask = null;
-        }
-    }
-
-    //用户登录类，其中mUserLoginTask是该类在外部实例化的一个对象
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-        private final String mUsername;//必须是10位数字（学号）
-        private final String mPassword;
-        CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
-        String result = "";//请求的结果
-        PrintWriter out = null;
-        BufferedReader in = null;
-
-        UserLoginTask(String username, String password) {
-            mUsername = username;
-            mPassword = password;
         }
 
         @Override
-        protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
+        protected void onPostExecute(final String result) {
+            Froze(false);
+            showToast(result);
+        }
+
+        @Override
+        protected void onCancelled() {
+            Froze(false);
+            showToast(this.getClass().getSimpleName() + " Cancelled");
+        }
+    }
+
+    private class UserLogin extends AsyncTask<Void, Void, String> {
+        private final String username;
+        private final String password;
+
+        public UserLogin(String username, String password){
+            this.username = username;
+            this.password = password;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            Froze(true);
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
             String strUrl = "http://139.129.47.180:8002/Errand/login";
-            URL Url = null;
+            URL Url;
             try {
                 Url = new URL(strUrl);
                 URLConnection urlConnection = Url.openConnection();
+                CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
                 if (msCookieManager.getCookieStore().getCookies().size() > 0) {
                     System.out.println(msCookieManager.getCookieStore().getCookies());
                     urlConnection.setRequestProperty("Cookie", TextUtils.join(";", msCookieManager.getCookieStore().getCookies()));
@@ -165,71 +203,69 @@ public class LoginActivity extends AppCompatActivity {
                 urlConnection.setRequestProperty("accept", "*/*");
                 urlConnection.setRequestProperty("connection", "Keep-Alive");
                 urlConnection.setRequestProperty("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
-                out = new PrintWriter(new OutputStreamWriter(urlConnection.getOutputStream(), "utf-8"));
-                String param = "username=" + mUsername + "&" + "password=" + mPassword;
+                PrintWriter out = new PrintWriter(new OutputStreamWriter(urlConnection.getOutputStream(), "utf-8"));
+                String param = "username=" + username + "&" + "password=" + password;
                 out.print(param);
                 out.flush();
-                in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
                 String line;
+                String result = "";
                 while ((line = in.readLine()) != null) {
                     result += line;
                 }
-                System.out.println("result = " + result);
+                return result;
             } catch (Exception e) {
-                System.out.println("login:发送POST请求出现异常！ " + e);
-                return false;
+                return "FAILED: " + e.toString();
             }
-            return result.equals("OK");
         }
 
         @Override
-        protected void onPostExecute(final Boolean success) {
-            mUserLoginTask = null;
-
-            if (success) {
+        protected void onPostExecute(final String result) {
+            Froze(false);
+            showToast(result);
+            if (!result.contains("FAILED")) {
+                getSharedPreferences("User", MODE_PRIVATE).edit().putString("username", username).putString("password", password).apply();
                 Intent i = new Intent(LoginActivity.this, MainActivity.class);
-                System.out.println("Login succeed");
                 startActivity(i);
                 finish();
-                //若请求成功，这里写的是进入主界面，可以根据自己的想法随意改，其他的类类似。
             } else {
-
-                System.out.println("Login Failed");
+                if (result.contains("active")) {
+                    validateLayout.setVisibility(View.VISIBLE);
+                }
             }
         }
 
         @Override
         protected void onCancelled() {
-            mUserLoginTask = null;
+            Froze(false);
+            showToast(this.getClass().getSimpleName() + " Cancelled");
         }
     }
 
-    /*
-        用户注册类，与登录类基本类似
-        */
-    public class UserRegisterTask extends AsyncTask<Void, Void, Boolean> {
-        private final String mUsername;
-        private final String mPassword;
-        CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
-        PrintWriter out = null;
-        BufferedReader in = null;
-        String result = "";
+    private class RegisterUser extends AsyncTask<Void, Void, String> {
+        private final String username;
+        private final String password;
 
-        UserRegisterTask(String username, String password) {
-            mUsername = username;
-            mPassword = password;
+        public RegisterUser(String username, String password){
+            this.username = username;
+            this.password = password;
         }
 
         @Override
-        protected Boolean doInBackground(Void... params) {
+        protected void onPreExecute() {
+            super.onPreExecute();
+            Froze(true);
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
             String strUrl = "http://139.129.47.180:8002/Errand/register";
-            URL Url = null;
+            URL Url;
             try {
                 Url = new URL(strUrl);
                 URLConnection urlConnection = Url.openConnection();
-                System.out.println("register!");
+                CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
                 if (msCookieManager.getCookieStore().getCookies().size() > 0) {
-                    System.out.println(msCookieManager.getCookieStore().getCookies());
                     urlConnection.setRequestProperty("Cookie", TextUtils.join(";", msCookieManager.getCookieStore().getCookies()));
                 }
                 urlConnection.setConnectTimeout(5000);
@@ -240,40 +276,107 @@ public class LoginActivity extends AppCompatActivity {
                 urlConnection.setRequestProperty("accept", "*/*");
                 urlConnection.setRequestProperty("connection", "Keep-Alive");
                 urlConnection.setRequestProperty("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
-                out = new PrintWriter(new OutputStreamWriter(urlConnection.getOutputStream(), "utf-8"));
-                String param = "username=" + mUsername + "&" + "password=" + mPassword;
+                PrintWriter out = new PrintWriter(new OutputStreamWriter(urlConnection.getOutputStream(), "utf-8"));
+                String param = "username=" + username + "&" + "password=" + password;
                 out.print(param);
                 out.flush();
-                in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
                 String line;
+                String result = "";
                 while ((line = in.readLine()) != null) {
                     result += line;
                 }
-                System.out.println(result);
+                return result;
             } catch (Exception e) {
-                System.out.println("register:发送POST请求出现异常！ " + e);
-                return false;
+                return "FAILED: " + e.toString();
             }
-            return result.equals("OK");
         }
 
         @Override
-        protected void onPostExecute(final Boolean success) {
-            mResTask = null;
-            //showProgress(false);
-            if (success) {
-                Intent i = new Intent(LoginActivity.this, MainActivity.class);
-                System.out.println("Register succeed!");
-                startActivity(i);
-                finish();
-            } else {
-                System.out.println("Register Failed");
+        protected void onPostExecute(final String result) {
+            Froze(false);
+            showToast(result);
+            if (!result.contains("FAILED")) {
+                land.setVisibility(View.GONE);
+                register.setVisibility(View.GONE);
+                validateLayout.setVisibility(View.VISIBLE);
             }
         }
 
         @Override
         protected void onCancelled() {
-            mResTask = null;
+            Froze(false);
+            showToast(this.getClass().getSimpleName() + " Cancelled");
+        }
+    }
+
+    private class ActivateUser extends AsyncTask<String, Void, String> {
+        private final String username;
+        private final String password;
+        private final String activeCode;
+
+        public ActivateUser(String username, String password, String activeCode){
+            this.username = username;
+            this.password = password;
+            this.activeCode = activeCode;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            Froze(true);
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            String strUrl = "http://139.129.47.180:8002/Errand/active";
+            URL Url;
+            try {
+                Url = new URL(strUrl);
+                URLConnection urlConnection = Url.openConnection();
+                CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
+                if (msCookieManager.getCookieStore().getCookies().size() > 0) {
+                    urlConnection.setRequestProperty("Cookie", TextUtils.join(";", msCookieManager.getCookieStore().getCookies()));
+                }
+                urlConnection.setConnectTimeout(5000);
+                urlConnection.setReadTimeout(5000);
+                urlConnection.setDoInput(true);
+                urlConnection.setDoOutput(true);
+                urlConnection.setUseCaches(false);
+                urlConnection.setRequestProperty("accept", "*/*");
+                urlConnection.setRequestProperty("connection", "Keep-Alive");
+                urlConnection.setRequestProperty("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
+                PrintWriter out = new PrintWriter(new OutputStreamWriter(urlConnection.getOutputStream(), "utf-8"));
+                String param = "username=" + username + "&" + "password=" + password + "&" + "activecode=" + activeCode;
+                out.print(param);
+                out.flush();
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String line;
+                String result = "";
+                while ((line = in.readLine()) != null) {
+                    result += line;
+                }
+                return result;
+            } catch (Exception e) {
+                return "FAILED: " + e.toString();
+            }
+        }
+
+        @Override
+        protected void onPostExecute(final String result) {
+            Froze(false);
+            showToast(result);
+            if (!result.contains("FAILED")) {
+                validateLayout.setVisibility(View.INVISIBLE);
+                land.setVisibility(View.VISIBLE);
+                register.setVisibility(View.VISIBLE);
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            Froze(false);
+            showToast(this.getClass().getSimpleName() + " Cancelled");
         }
     }
 }
