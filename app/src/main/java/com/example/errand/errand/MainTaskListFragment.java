@@ -1,15 +1,7 @@
-/*
-fragment，任务列表，对应tasklist.xml，
-动态显示了任务的列表，任务列表项对应的是tasjklist_item.xml
-并可以点击任务项进入对应的任务详情页task_info.java
-
-*/
-
-
 package com.example.errand.errand;
 
-
-import android.app.Fragment;
+import android.app.ListFragment;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -17,9 +9,10 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.errand.errand.Objects.TaskInfo;
@@ -36,77 +29,42 @@ import java.net.CookieManager;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
-public class MainTaskListFragment extends Fragment {
-    private ListView mListView;
-    private SimpleAdapter mSchedule;
+public class MainTaskListFragment extends ListFragment {
+    private TaskListAdapter mAdapter;
     private List<TaskInfo> mTasks;
     private Integer minPk;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.tasklist, container, false);
-        mListView = (ListView) view.findViewById(R.id.tasklist_listView);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         mTasks = new ArrayList<>();
         minPk = Integer.MAX_VALUE;
+        mAdapter = new TaskListAdapter(getActivity(),R.layout.tasklist_item, mTasks);
+        setListAdapter(mAdapter);
         new BrowseAllTasks(minPk).execute();
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Map<String, String> map = (Map<String, String>) mSchedule.getItem(i);
-                String temp = map.get("task_item_content");
-                Intent intent = new Intent(getActivity(), TaskInfoDetailActivity.class);
-                startActivityForResult(intent, 0);
-            }
-        });
-        return view;
+    }
+
+
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        Integer pk = mAdapter.getItem(position).pk;
+        Intent intent = new Intent(getActivity(), TaskInfoDetailActivity.class);
+        intent.putExtra("pk", pk);
+        startActivityForResult(intent, 0);
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        new BrowseAllTasks(minPk).execute();
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Map<String, String> map = (Map<String, String>) mSchedule.getItem(i);
-                String temp = map.get("task_item_content");
-                Intent intent = new Intent(getActivity(), TaskInfoDetailActivity.class);
-                startActivityForResult(intent, 0);
-            }
-        });
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.tasklist, container, false);
+        return view;
     }
 
     private void showToast(String content) {
         Toast.makeText(getActivity().getApplicationContext(), content, Toast.LENGTH_LONG).show();
     }
-
-//    public void refresh() {
-//        BrowseAllTasks mUserBrowseAllTask = new BrowseAllTasks(Integer.toString(Integer.MAX_VALUE));
-//        mUserBrowseAllTask.execute();
-//        ArrayList<HashMap<String, String>> mylist = new ArrayList<HashMap<String, String>>();
-//        int item_num = 20;
-//        for (int i = 0; i < item_num; i++) {
-//            String taskcontent = "求帮忙拿快递！！";
-//            String taskuser = "personA";
-//            String taskpay = "      5RMB";
-//            HashMap<String, String> map = new HashMap<String, String>();
-//            map.put("task_item_content", taskcontent);
-//            map.put("task_item_person", taskuser);
-//            map.put("task_item_pay", taskpay);
-//            mylist.add(map);
-//        }
-//        mSchedule = new SimpleAdapter(this.getActivity(), mylist, R.layout.tasklist_item,
-//                new String[]{"task_item_content", "task_item_person", "task_item_pay"},
-//                new int[]{R.id.task_item_content, R.id.task_item_person, R.id.task_item_pay});
-//        mListView.setAdapter(mSchedule);
-//
-//    }
-
 
     private class BrowseAllTasks extends AsyncTask<Void, Void, String> {
         private final Integer lastPk;
@@ -160,6 +118,7 @@ public class MainTaskListFragment extends Fragment {
                     for (int i = 0; i < jsonArray.length(); ++i) {
                         JSONObject jsonObject = jsonArray.optJSONObject(i);
                         info.pk = jsonObject.optInt("pk");
+                        minPk = Math.min(minPk, info.pk);
                         jsonObject = new JSONObject(jsonObject.optString("fields"));
                         info.creator = jsonObject.optString("create_account");
                         info.createTime = jsonObject.optString("create_time");
@@ -171,18 +130,14 @@ public class MainTaskListFragment extends Fragment {
                         info.comment = jsonObject.optString("comment");
                         info.score = jsonObject.optInt("score");
                         JSONArray takers = jsonObject.optJSONArray("response_accounts");
-                        for (int j = 0; j < takers.length(); ++j)
+                        for (int j = 0; j < takers.length(); ++j) {
                             info.takers.add(takers.optString(j));
+                        }
                         mTasks.add(info);
                     }
                 } catch (Exception eJson) {
                     showToast("ERROR: "+eJson.toString());
                 }
-
-//                mSchedule = new SimpleAdapter(getActivity(),mTasks, R.layout.tasklist_item,
-//                        new String[]{"task_item_content", "task_item_person", "task_item_pay"},
-//                        new int[]{R.id.task_item_content, R.id.task_item_person, R.id.task_item_pay});
-                mListView.setAdapter(mSchedule);
             }
         }
 
@@ -191,4 +146,33 @@ public class MainTaskListFragment extends Fragment {
             showToast(this.getClass().getSimpleName() + " Cancelled");
         }
     }
+
+    private class TaskListAdapter extends ArrayAdapter<TaskInfo>{
+        private int resource;
+        public TaskListAdapter(Context context, int resource, List<TaskInfo> objects) {
+            super(context, resource, objects);
+            this.resource = resource;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            LinearLayout taskItemView;
+            TaskInfo task = getItem(position);
+            if(convertView == null){
+                taskItemView = new LinearLayout(getContext());
+                LayoutInflater inflater = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                inflater.inflate(resource, taskItemView, true);
+            }else{
+                taskItemView = (LinearLayout)convertView;
+            }
+            TextView headline = (TextView) taskItemView.findViewById(R.id.task_item_headline);
+            headline.setText(task.headline);
+            TextView username = (TextView) taskItemView.findViewById(R.id.task_item_username);
+            username.setText(task.creator);
+            TextView pay = (TextView) taskItemView.findViewById(R.id.task_item_pay);
+            pay.setText(task.reward);
+            return taskItemView;
+        }
+    }
+
 }

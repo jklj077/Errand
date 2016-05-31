@@ -5,6 +5,7 @@
 */
 package com.example.errand.errand;
 
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
@@ -56,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void hideAllFragment(FragmentTransaction fragmentTransaction) {
-        if (frame_list != null) fragmentTransaction.hide(frame_list);
+        if (frame_list != null) fragmentTransaction.hide( frame_list);
         if (frame_rank != null) fragmentTransaction.hide(frame_rank);
         if (frame_info != null) fragmentTransaction.hide(frame_info);
     }
