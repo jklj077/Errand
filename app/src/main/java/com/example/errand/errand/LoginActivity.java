@@ -36,6 +36,7 @@ public class LoginActivity extends AppCompatActivity {
     private LinearLayout validateLayout;
     private Button validate;
     private EditText validateCode;
+    private Errand app;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,17 +44,10 @@ public class LoginActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         assert actionBar != null;
         actionBar.hide();
+        app = (Errand) getApplication();
         setContentView(R.layout.activity_login);
 
         CookieHandler.setDefault(new CookieManager());
-        new GetKey().execute();
-
-        SharedPreferences UserPassport = getSharedPreferences("User", MODE_PRIVATE);
-        String savedUsername = UserPassport.getString("username", null);
-        String savedPassword = UserPassport.getString("password", null);
-        if (savedUsername != null && savedPassword != null) {
-            new UserLogin(savedUsername, savedPassword).execute();
-        }
 
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         username = (EditText) findViewById(R.id.username);
@@ -67,7 +61,7 @@ public class LoginActivity extends AppCompatActivity {
         land.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new UserLogin(username.getText().toString(), password.getText().toString()).execute();
+                new UserLogin(username.getText().toString(), password.getText().toString(), false).execute();
             }
         });
 
@@ -82,6 +76,15 @@ public class LoginActivity extends AppCompatActivity {
                 new ActivateUser(username.getText().toString(), password.getText().toString(), validateCode.getText().toString()).execute();
             }
         });
+
+        new GetKey(false).execute();
+
+        SharedPreferences UserPassport = getSharedPreferences("User", MODE_PRIVATE);
+        String savedUsername = UserPassport.getString("username", null);
+        String savedPassword = UserPassport.getString("password", null);
+        if (savedUsername != null && savedPassword != null) {
+            new UserLogin(savedUsername, savedPassword, true).execute();
+        }
 
     }
 
@@ -114,6 +117,11 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private class GetKey extends AsyncTask<Void, Void, String> {
+        private final boolean isRetry;
+        public GetKey(boolean isRetry){
+            this.isRetry = isRetry;
+        }
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -157,29 +165,41 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(final String result) {
+            if(!result.contains("FAILED")){
+                int l = result.indexOf('(');
+                int r = result.indexOf(')');
+                app.key = result.substring(l, r+1);
+            }else{
+                if(isRetry) {
+                    showToast("Internal Error: Please Retry");
+                }
+            }
             Froze(false);
-            showToast(result);
+
         }
 
-        @Override
-        protected void onCancelled() {
-            Froze(false);
-            showToast(this.getClass().getSimpleName() + " Cancelled");
-        }
     }
 
     private class UserLogin extends AsyncTask<Void, Void, String> {
         private final String username;
         private final String password;
+        private final boolean isAuto;
 
-        public UserLogin(String username, String password){
+        public UserLogin(String username, String password, boolean isAuto){
             this.username = username;
             this.password = password;
+            this.isAuto = isAuto;
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            if(app.key==null) {
+                new GetKey(!isAuto).execute();
+                if(app.key==null){
+                    this.cancel(true);
+                }
+            }
             Froze(true);
         }
 
@@ -222,7 +242,7 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(final String result) {
             Froze(false);
-            showToast(result);
+            //showToast(result);
             if (!result.contains("FAILED")) {
                 getSharedPreferences("User", MODE_PRIVATE).edit().putString("username", username).putString("password", password).apply();
                 Intent i = new Intent(LoginActivity.this, MainActivity.class);
@@ -230,15 +250,14 @@ public class LoginActivity extends AppCompatActivity {
                 finish();
             } else {
                 if (result.contains("active")) {
+                    showToast("Account Not Activated");
                     validateLayout.setVisibility(View.VISIBLE);
+                }else if(isAuto){
+                    showToast("FAILED: Password Changed");
+                }else{
+                    showToast(result);
                 }
             }
-        }
-
-        @Override
-        protected void onCancelled() {
-            Froze(false);
-            showToast(this.getClass().getSimpleName() + " Cancelled");
         }
     }
 
@@ -254,6 +273,12 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            if(app.key==null) {
+                new GetKey(true).execute();
+                if(app.key==null){
+                    this.cancel(true);
+                }
+            }
             Froze(true);
         }
 
@@ -301,12 +326,6 @@ public class LoginActivity extends AppCompatActivity {
                 register.setVisibility(View.GONE);
                 validateLayout.setVisibility(View.VISIBLE);
             }
-        }
-
-        @Override
-        protected void onCancelled() {
-            Froze(false);
-            showToast(this.getClass().getSimpleName() + " Cancelled");
         }
     }
 

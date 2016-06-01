@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.view.ViewCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +18,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.errand.errand.Objects.TaskInfo;
+import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
+import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -29,22 +33,35 @@ import java.net.CookieManager;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
-
 public class MainTaskListFragment extends ListFragment {
-    private TaskListAdapter mAdapter;
     private List<TaskInfo> mTasks;
     private Integer minPk;
+    private TaskListAdapter mAdapter;
+    private SwipyRefreshLayout mSwipeRefreshLayout;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mTasks = new ArrayList<>();
         minPk = Integer.MAX_VALUE;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         mAdapter = new TaskListAdapter(getActivity(),R.layout.tasklist_item, mTasks);
         setListAdapter(mAdapter);
-        new BrowseAllTasks(minPk).execute();
+        mSwipeRefreshLayout = (SwipyRefreshLayout) getActivity().findViewById(R.id.tasklist_refresh);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener(){
+            @Override
+            public void onRefresh(SwipyRefreshLayoutDirection direction) {
+                new BrowseAllTasks(minPk, direction).execute();
+            }
+        });
+        new BrowseAllTasks().execute();
     }
 
 
@@ -58,8 +75,7 @@ public class MainTaskListFragment extends ListFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.tasklist, container, false);
-        return view;
+        return inflater.inflate(R.layout.tasklist, container, false);
     }
 
     private void showToast(String content) {
@@ -68,9 +84,23 @@ public class MainTaskListFragment extends ListFragment {
 
     private class BrowseAllTasks extends AsyncTask<Void, Void, String> {
         private final Integer lastPk;
+        private boolean isRefresh;
+        private final SwipyRefreshLayoutDirection direction;
 
-        public BrowseAllTasks(Integer pk) {
-            lastPk = pk;
+        public BrowseAllTasks(Integer pk, SwipyRefreshLayoutDirection direction){
+            if(direction == SwipyRefreshLayoutDirection.TOP) {
+                lastPk = Integer.MAX_VALUE;
+            }else{
+                lastPk = pk;
+            }
+            isRefresh = true;
+            this.direction = direction;
+        }
+
+        public BrowseAllTasks() {
+            lastPk = Integer.MAX_VALUE;
+            isRefresh = false;
+            this.direction=SwipyRefreshLayoutDirection.BOTTOM;
         }
 
         @Override
@@ -110,15 +140,25 @@ public class MainTaskListFragment extends ListFragment {
 
         @Override
         protected void onPostExecute(final String result) {
-            showToast(result);
+            if(isRefresh) {
+                mSwipeRefreshLayout.setRefreshing(false);
+            }
             if (!result.contains("FAILED")) {
+                List<TaskInfo> infos = new ArrayList<>();
+                HashSet<Integer> pks = new HashSet<>();
+                for(int i=0;i<mAdapter.getCount();++i){
+                    TaskInfo info = mAdapter.getItem(i);
+                    infos.add(info);
+                    pks.add(info.pk);
+                }
+                mAdapter.clear();
+                List<TaskInfo> newInfos = new ArrayList<>();
                 try {
                     JSONArray jsonArray = new JSONArray(result);
                     TaskInfo info = new TaskInfo();
                     for (int i = 0; i < jsonArray.length(); ++i) {
                         JSONObject jsonObject = jsonArray.optJSONObject(i);
                         info.pk = jsonObject.optInt("pk");
-                        minPk = Math.min(minPk, info.pk);
                         jsonObject = new JSONObject(jsonObject.optString("fields"));
                         info.creator = jsonObject.optString("create_account");
                         info.createTime = jsonObject.optString("create_time");
@@ -133,18 +173,34 @@ public class MainTaskListFragment extends ListFragment {
                         for (int j = 0; j < takers.length(); ++j) {
                             info.takers.add(takers.optString(j));
                         }
-                        mTasks.add(info);
+                        if(!pks.contains(info.pk)){
+                            pks.add(info.pk);
+                            newInfos.add(info);
+                            minPk = Math.min(minPk, info.pk);
+                        }
                     }
                 } catch (Exception eJson) {
                     showToast("ERROR: "+eJson.toString());
                 }
+                if(direction == SwipyRefreshLayoutDirection.TOP){
+                    mAdapter.addAll(newInfos);
+                    mAdapter.addAll(infos);
+                }else{
+                    mAdapter.addAll(infos);
+                    mAdapter.addAll(newInfos);
+                }
+                if(newInfos.size() ==0){
+                    showToast("No More");
+                }
+            }else{
+                showToast("Error: Please Retry");
             }
         }
 
-        @Override
-        protected void onCancelled() {
-            showToast(this.getClass().getSimpleName() + " Cancelled");
-        }
+//        @Override
+//        protected void onCancelled() {
+//            showToast(this.getClass().getSimpleName() + " Cancelled");
+//        }
     }
 
     private class TaskListAdapter extends ArrayAdapter<TaskInfo>{

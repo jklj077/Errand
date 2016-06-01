@@ -1,36 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <RelativeLayout
-        android:id="@+id/task_list"
-        android:minWidth="0dp"
+
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:background="#91dadf"
-        android:clickable="false">
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/task_list"
+        android:id="@+id/textView2"
+        android:textSize="20sp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_vertical|center_horizontal"
+        android:background="#91dadf" />
+<com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_below="@+id/textView2"
+    android:id="@+id/tasklist_refresh"
+    app:direction="both">
+        <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@id/android:list"/>
+</com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="@string/task_list"
-            android:id="@+id/textView2"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"
-            android:textSize="20sp" />
-
-
-
-    </RelativeLayout>
-
-
-    <ListView
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:id="@id/android:list"
-        android:layout_below="@+id/task_list"
-        android:layout_alignParentLeft="true" />
 
 </RelativeLayout>
