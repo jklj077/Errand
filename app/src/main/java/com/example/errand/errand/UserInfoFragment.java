@@ -31,7 +31,7 @@ import java.net.URLConnection;
 /**
  * Created by xiasifeng on 2016/5/25.
  */
-public class MainUserInfoFragment extends Fragment {
+public class UserInfoFragment extends Fragment {
 
     UserLogoutTask mLogoutTask;
     private LinearLayout user;

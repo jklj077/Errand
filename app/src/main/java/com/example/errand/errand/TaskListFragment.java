@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,17 +34,19 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-public class MainTaskListFragment extends ListFragment {
+public class TaskListFragment extends ListFragment {
     private List<TaskInfo> mTasks;
     private Integer minPk;
     private TaskListAdapter mAdapter;
     private SwipyRefreshLayout mSwipeRefreshLayout;
+    private Errand app;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mTasks = new ArrayList<>();
         minPk = Integer.MAX_VALUE;
+        app = ((Errand)getActivity().getApplication());
     }
 
     @Override
@@ -68,8 +68,10 @@ public class MainTaskListFragment extends ListFragment {
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         Integer pk = mAdapter.getItem(position).pk;
+        String username = mAdapter.getItem(position).creator;
         Intent intent = new Intent(getActivity(), TaskInfoDetailActivity.class);
         intent.putExtra("pk", pk);
+        intent.putExtra("isMine", username.equals(app.username));
         startActivityForResult(intent, 0);
     }
 
@@ -89,6 +91,7 @@ public class MainTaskListFragment extends ListFragment {
 
         public BrowseAllTasks(Integer pk, SwipyRefreshLayoutDirection direction){
             if(direction == SwipyRefreshLayoutDirection.TOP) {
+                minPk = Integer.MAX_VALUE;
                 lastPk = Integer.MAX_VALUE;
             }else{
                 lastPk = pk;
@@ -100,7 +103,7 @@ public class MainTaskListFragment extends ListFragment {
         public BrowseAllTasks() {
             lastPk = Integer.MAX_VALUE;
             isRefresh = false;
-            this.direction=SwipyRefreshLayoutDirection.BOTTOM;
+            this.direction=SwipyRefreshLayoutDirection.TOP;
         }
 
         @Override
@@ -136,7 +139,8 @@ public class MainTaskListFragment extends ListFragment {
                 return result;
             } catch (Exception e) {
                 return "FAILED: "+e.toString();
-            }}
+            }
+        }
 
         @Override
         protected void onPostExecute(final String result) {
@@ -144,63 +148,41 @@ public class MainTaskListFragment extends ListFragment {
                 mSwipeRefreshLayout.setRefreshing(false);
             }
             if (!result.contains("FAILED")) {
-                List<TaskInfo> infos = new ArrayList<>();
-                HashSet<Integer> pks = new HashSet<>();
-                for(int i=0;i<mAdapter.getCount();++i){
-                    TaskInfo info = mAdapter.getItem(i);
-                    infos.add(info);
-                    pks.add(info.pk);
+                if(direction==SwipyRefreshLayoutDirection.TOP) {
+                    mAdapter.clear();
                 }
-                mAdapter.clear();
-                List<TaskInfo> newInfos = new ArrayList<>();
                 try {
                     JSONArray jsonArray = new JSONArray(result);
-                    TaskInfo info = new TaskInfo();
-                    for (int i = 0; i < jsonArray.length(); ++i) {
-                        JSONObject jsonObject = jsonArray.optJSONObject(i);
-                        info.pk = jsonObject.optInt("pk");
-                        jsonObject = new JSONObject(jsonObject.optString("fields"));
-                        info.creator = jsonObject.optString("create_account");
-                        info.createTime = jsonObject.optString("create_time");
-                        info.status = jsonObject.optString("status");
-                        info.headline = jsonObject.optString("headline");
-                        info.detail = jsonObject.optString("detail");
-                        info.executor = jsonObject.optString("execute_account");
-                        info.reward = jsonObject.optString("reward");
-                        info.comment = jsonObject.optString("comment");
-                        info.score = jsonObject.optInt("score");
-                        JSONArray takers = jsonObject.optJSONArray("response_accounts");
-                        for (int j = 0; j < takers.length(); ++j) {
-                            info.takers.add(takers.optString(j));
-                        }
-                        if(!pks.contains(info.pk)){
-                            pks.add(info.pk);
-                            newInfos.add(info);
+                    if(jsonArray.length() == 0){
+                        showToast("No More");
+                    }else {
+                        for (int i = 0; i < jsonArray.length(); ++i) {
+                            TaskInfo info = new TaskInfo();
+                            JSONObject jsonObject = jsonArray.optJSONObject(i);
+                            info.pk = jsonObject.optInt("pk");
                             minPk = Math.min(minPk, info.pk);
+                            jsonObject = new JSONObject(jsonObject.optString("fields"));
+                            info.creator = jsonObject.optString("create_account");
+                            info.createTime = jsonObject.optString("create_time");
+                            info.status = jsonObject.optString("status");
+                            info.headline = jsonObject.optString("headline");
+                            info.detail = jsonObject.optString("detail");
+                            info.executor = jsonObject.optString("execute_account");
+                            info.reward = jsonObject.optString("reward");
+                            info.comment = jsonObject.optString("comment");
+                            info.score = jsonObject.optInt("score");
+                            JSONArray takers = jsonObject.optJSONArray("response_accounts");
+                            for (int j = 0; j < takers.length(); ++j) {
+                                info.takers.add(takers.optString(j));
+                            }
+                            mAdapter.add(info);
                         }
                     }
                 } catch (Exception eJson) {
                     showToast("ERROR: "+eJson.toString());
                 }
-                if(direction == SwipyRefreshLayoutDirection.TOP){
-                    mAdapter.addAll(newInfos);
-                    mAdapter.addAll(infos);
-                }else{
-                    mAdapter.addAll(infos);
-                    mAdapter.addAll(newInfos);
-                }
-                if(newInfos.size() ==0){
-                    showToast("No More");
-                }
-            }else{
-                showToast("Error: Please Retry");
             }
         }
-
-//        @Override
-//        protected void onCancelled() {
-//            showToast(this.getClass().getSimpleName() + " Cancelled");
-//        }
     }
 
     private class TaskListAdapter extends ArrayAdapter<TaskInfo>{

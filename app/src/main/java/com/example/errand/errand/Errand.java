@@ -7,10 +7,12 @@ import android.app.Application;
  */
 public class Errand extends Application {
     public String key;
+    public String username;
 
     @Override
     public void onCreate() {
         super.onCreate();
         key = null;
+        username = null;
     }
 }

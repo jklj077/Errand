@@ -21,7 +21,7 @@ import java.util.HashMap;
 /**
  * Created by xiasifeng on 2016/5/25.
  */
-public class MainRankListFragment extends Fragment {
+public class RankListFragment extends Fragment {
 
     private int item_num=20;
     private ListView listview;
@@ -56,13 +56,13 @@ public class MainRankListFragment extends Fragment {
             username="personA";
             level="1";
             HashMap<String, String> map = new HashMap<String, String>();
-            map.put("MainRankListFragment", rank);
+            map.put("RankListFragment", rank);
             map.put("username", username);
             map.put("level", level);
             mylist.add(map);
         }
-        mSchedule = new SimpleAdapter( this.getActivity(), mylist, R.layout.user_list_item,
-                new String[]{"MainRankListFragment", "username", "level"},
+        mSchedule = new SimpleAdapter( this.getActivity(), mylist, R.layout.user_item,
+                new String[]{"RankListFragment", "username", "level"},
                 new int[]{R.id.rank,R.id.username, R.id.level});
         listview.setAdapter(mSchedule);
 

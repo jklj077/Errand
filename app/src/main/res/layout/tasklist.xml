@@ -10,7 +10,7 @@
         android:layout_height="56dp"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="@string/task_list"
-        android:id="@+id/textView2"
+        android:id="@+id/healine"
         android:textSize="20sp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
@@ -19,7 +19,7 @@
 <com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_below="@+id/textView2"
+    android:layout_below="@+id/healine"
     android:id="@+id/tasklist_refresh"
     app:direction="both">
         <ListView

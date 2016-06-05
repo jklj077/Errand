@@ -9,18 +9,36 @@
 package com.example.errand.errand;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.TextInputEditText;
+import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.example.errand.errand.Objects.TaskActionInfo;
+import com.example.errand.errand.Objects.TaskInfo;
+import com.example.errand.errand.Objects.UserInfo;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -34,54 +52,213 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-//改变消息的类型，用于changeinfo页更改消息完毕后返回时确定更改的是哪个消息
-enum infotype {
-    short_info, positoin1
-}
-
 public class TaskInfoDetailActivity extends Activity {
+    private TaskInfo taskInfo;
+    private UserInfo userInfo;
+    private int pk;
+    private boolean isMine;
 
-    private SimpleAdapter mSchedule;
-    private infotype send_type;
-    private TextView shortinfo;
+    private TextView headline;
+    private TextView ownerUsername;
+    private TextView ownerLevel;
+    private TextView status;
+    private TextView payment;
+    private TextView detail;
+    private TextView comment;
+
     private TextView back;
-    private ListView user_list;
-    private ArrayList<HashMap<String, String>> mylist;
-    private int usernum;
+    private TextView confirm;
+    private ListView takerList;
+    private ListView actionList;
 
+    private EditText addNewAction;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        pk = getIntent().getIntExtra("pk", -1);
+        isMine = getIntent().getBooleanExtra("isMine", false);
+
         setContentView(R.layout.activity_task_info);
 
-        user_list = (ListView) findViewById(R.id.user_list);
-        shortinfo = (TextView) findViewById(R.id.info_short);
-        user_refresh();
-
-        user_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        headline = (TextView) findViewById(R.id.healine);
+        headline.setClickable(isMine);
+        headline.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
-
-                Intent intent = new Intent(TaskInfoDetailActivity.this, UserInfoDetailActivity.class);
-                startActivityForResult(intent, 0);
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(TaskInfoDetailActivity.this);
+                builder.setTitle("Change Headline");
+                final EditText content = new EditText(getApplicationContext());
+                content.setText(((TextView)v).getText());
+                builder.setView(content);
+                builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener(){
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String headline = content.getText().toString();
+                        new UserChangetaskTask(Integer.toString(pk), headline, taskInfo.detail, taskInfo.reward).execute();
+                    }
+                });
+                builder.setNegativeButton("Cancel", null);
+                AlertDialog dialog = builder.create();
+                dialog.show();
             }
         });
 
-        shortinfo.setOnClickListener(new View.OnClickListener() {
+        status = (TextView) findViewById(R.id.status);
+        ownerUsername = (TextView) findViewById(R.id.user_item_username);
+        ownerLevel = (TextView) findViewById(R.id.user_item_level);
+
+        payment = (TextView) findViewById(R.id.reward);
+        payment.setClickable(isMine);
+        payment.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                send_type = infotype.short_info;
-                Intent intent = new Intent(TaskInfoDetailActivity.this, UserInfoChangeActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putString("content", shortinfo.getText().toString());
-                intent.putExtras(bundle);
-                startActivityForResult(intent, 0);
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(TaskInfoDetailActivity.this);
+                builder.setTitle("Change Payment");
+                EditText content = new EditText(getApplicationContext());
+                content.setText(((TextView)v).getText());
+                builder.setView(content);
+                builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener(){
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener(){
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
+        detail = (TextView) findViewById(R.id.detail);
+        detail.setClickable(isMine);
+        detail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(TaskInfoDetailActivity.this);
+                builder.setTitle("Change Detail");
+                EditText content = new EditText(getApplicationContext());
+                content.setText(((TextView)v).getText());
+                builder.setView(content);
+                builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener(){
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                builder.setNegativeButton("Cancel", null);
+                AlertDialog dialog = builder.create();
+                dialog.show();
             }
         });
 
+        comment = (TextView) findViewById(R.id.comment);
+        comment.setClickable(isMine);
+        comment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(TaskInfoDetailActivity.this);
+                builder.setTitle("Comment");
+                EditText content = new EditText(getApplicationContext());
+                builder.setView(content);
+                builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener(){
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                builder.setNegativeButton("Cancel", null);
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
+
+        takerList = (ListView) findViewById(R.id.user_list);
+        actionList = (ListView) findViewById(R.id.taskActionListView);
+
+        addNewAction = (EditText) findViewById(R.id.addNewTaskAction);
+        addNewAction.setVisibility(View.VISIBLE);
+        addNewAction.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(TaskInfoDetailActivity.this);
+                builder.setTitle("Add Action");
+                final LinearLayout content = (LinearLayout) getLayoutInflater().inflate(R.layout.task_action_change, null);
+                builder.setView(content);
+                builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener(){
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String location = ((TextInputLayout)content.findViewById(R.id.action_change_location)).getEditText().getText().toString();
+                        String action = ((TextInputLayout)content.findViewById(R.id.action_change_action)).getEditText().getText().toString();
+                        String start = ((TextInputLayout)content.findViewById(R.id.action_change_start)).getEditText().getText().toString();
+                        String end = ((TextInputLayout)content.findViewById(R.id.action_change_end)).getEditText().getText().toString();
+                        new UserAddTaskActionTask(Integer.toString(pk), start, end, location, action).execute();
+                    }
+                });
+                builder.setNegativeButton("Cancel",null);
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
+
+        confirm = (TextView) findViewById(R.id.confirm);
         back = (TextView) findViewById(R.id.back);
+
+
+        takerList.setAdapter(new TakerListAdapter(this, R.layout.user, new ArrayList<String>()));
+        takerList.setClickable(isMine);
+        takerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(TaskInfoDetailActivity.this);
+                builder.setTitle("Pick Executor");
+                builder.setMessage("Choose "+parent.getItemAtPosition(position)+" as executor?");
+                builder.setPositiveButton("Choose", new DialogInterface.OnClickListener(){
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                builder.setNegativeButton("Cancel", null);
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
+
+        actionList.setAdapter(new TaskActionListAdapter(this, R.layout.task_action_item, new ArrayList<TaskActionInfo>()));
+        actionList.setClickable(isMine);
+        actionList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                TaskActionInfo info = (TaskActionInfo) parent.getAdapter().getItem(position);
+                AlertDialog.Builder builder = new AlertDialog.Builder(TaskInfoDetailActivity.this);
+                builder.setTitle("Change Action");
+                final LinearLayout content = (LinearLayout) getLayoutInflater().inflate(R.layout.task_action_change, null);
+                ((TextInputLayout)content.findViewById(R.id.action_change_location)).getEditText().setText(info.place);
+                ((TextInputLayout)content.findViewById(R.id.action_change_action)).getEditText().setText(info.action);
+                ((TextInputLayout)content.findViewById(R.id.action_change_start)).getEditText().setText(info.startTime);
+                ((TextInputLayout)content.findViewById(R.id.action_change_end)).getEditText().setText(info.endTime);
+                builder.setView(content);
+                builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener(){
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String location = ((TextInputLayout)content.findViewById(R.id.action_change_location)).getEditText().getText().toString();
+                        String action = ((TextInputLayout)content.findViewById(R.id.action_change_action)).getEditText().getText().toString();
+                        String start = ((TextInputLayout)content.findViewById(R.id.action_change_start)).getEditText().getText().toString();
+                        String end = ((TextInputLayout)content.findViewById(R.id.action_change_end)).getEditText().getText().toString();
+                        new UserChangeTaskActionTask(Integer.toString(pk), start, end, location, action).execute();
+                    }
+                });
+                builder.setNegativeButton("Cancel", null);
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
+
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -90,41 +267,172 @@ public class TaskInfoDetailActivity extends Activity {
                 finish();
             }
         });
-    }
-
-    public void user_refresh() {
-        usernum = 4;
-        mylist = new ArrayList<HashMap<String, String>>();
-        for (int i = 0; i < usernum; i++) {
-            String username = "personA";
-            HashMap<String, String> map = new HashMap<String, String>();
-            map.put("user", username);
-            mylist.add(map);
-        }
-        mSchedule = new SimpleAdapter(this, mylist, R.layout.user,
-                new String[]{"user"},
-                new int[]{R.id.user});
-        user_list.setAdapter(mSchedule);
+        new GetTaskInfo(pk).execute();
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            Bundle bundle = data.getExtras();
-            if (bundle != null) {
-                String content = bundle.getString("content");
-                if (send_type == infotype.short_info) {
-                    shortinfo.setText(content);
+    protected void onResume() {
+        super.onResume();
+        new GetTaskInfo(pk).execute();
+    }
+
+    //    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        if (resultCode == RESULT_OK) {
+//            Bundle bundle = data.getExtras();
+//            if (bundle != null) {
+//                String content = bundle.getString("content");
+//                if (send_type == infotype.short_info) {
+//                    shortinfo.setText(content);
+//                }
+//            }
+//        }
+//    }
+
+    private class TaskActionListAdapter extends ArrayAdapter<TaskActionInfo> {
+        private int resource;
+        public TaskActionListAdapter(Context context, int resource, List<TaskActionInfo> objects) {
+            super(context, resource, objects);
+            this.resource = resource;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            LinearLayout taskActionItemView;
+            TaskActionInfo info = getItem(position);
+            if(convertView == null){
+                taskActionItemView = new LinearLayout(getContext());
+                LayoutInflater inflater = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                inflater.inflate(resource, taskActionItemView, true);
+            }else{
+                taskActionItemView = (LinearLayout)convertView;
+            }
+            TextView location = (TextView) taskActionItemView.findViewById(R.id.location);
+            location.setText(info.place);
+            TextView period = (TextView) taskActionItemView.findViewById(R.id.period);
+            period.setText(info.startTime+"-"+info.endTime);
+            TextView action = (TextView) taskActionItemView.findViewById(R.id.action);
+            action.setText(info.action);
+            return taskActionItemView;
+        }
+    }
+
+    private class TakerListAdapter extends ArrayAdapter<String> {
+        private int resource;
+        public TakerListAdapter(Context context, int resource, List<String> objects) {
+            super(context, resource, objects);
+            this.resource = resource;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            LinearLayout userItemView;
+            String info = getItem(position);
+            if(convertView == null){
+                userItemView = new LinearLayout(getContext());
+                LayoutInflater inflater = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                inflater.inflate(resource, userItemView, true);
+            }else{
+                userItemView = (LinearLayout)convertView;
+            }
+            TextView username = (TextView) userItemView.findViewById(R.id.user);
+            username.setText(info);
+            return userItemView;
+        }
+    }
+
+    private class GetTaskInfo extends AsyncTask<Void, Void, String> {
+        private final Integer pk;
+
+        public GetTaskInfo(Integer pk){
+            this.pk = pk;
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            String strUrl = "http://139.129.47.180:8002/Errand/browsealltask";
+            URL Url;
+            String result="";
+            try {
+                Url = new URL(strUrl);
+                URLConnection urlConnection = Url.openConnection();
+                CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
+                if (msCookieManager.getCookieStore().getCookies().size() > 0) {
+                    System.out.println(msCookieManager.getCookieStore().getCookies());
+                    urlConnection.setRequestProperty("Cookie", TextUtils.join(";", msCookieManager.getCookieStore().getCookies()));
                 }
+                urlConnection.setConnectTimeout(5000);
+                urlConnection.setReadTimeout(5000);
+                urlConnection.setDoInput(true);
+                urlConnection.setDoOutput(true);
+                urlConnection.setUseCaches(false);
+                urlConnection.setRequestProperty("accept", "*/*");
+                urlConnection.setRequestProperty("connection", "Keep-Alive");
+                urlConnection.setRequestProperty("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
+                PrintWriter out = new PrintWriter(new OutputStreamWriter(urlConnection.getOutputStream(), "utf-8"));
+                String param = "pk=" + (pk+1);
+                out.print(param);
+                out.flush();
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String line;
+                while ((line = in.readLine()) != null) {
+                    result += line;
+                }
+                return result;
+            } catch (Exception e) {
+                return "FAILED: "+e.toString();
+            }
+        }
+
+        @Override
+        protected void onPostExecute(final String result) {
+            if (!result.contains("FAILED")) {
+                try {
+                    taskInfo = new TaskInfo();
+                    JSONArray jsonArray = new JSONArray(result);
+                            JSONObject jsonObject = jsonArray.optJSONObject(0);
+                            taskInfo.pk = jsonObject.optInt("pk");
+                            jsonObject = new JSONObject(jsonObject.optString("fields"));
+                    taskInfo.creator = jsonObject.optString("create_account");
+                    taskInfo.createTime = jsonObject.optString("create_time");
+                    taskInfo.status = jsonObject.optString("status");
+                    taskInfo.headline = jsonObject.optString("headline");
+                    taskInfo.detail = jsonObject.optString("detail");
+                    taskInfo.executor = jsonObject.optString("execute_account");
+                    taskInfo.reward = jsonObject.optString("reward");
+                    taskInfo.comment = jsonObject.optString("comment");
+                    taskInfo.score = jsonObject.optInt("score");
+                            JSONArray takers = jsonObject.optJSONArray("response_accounts");
+                            for (int j = 0; j < takers.length(); ++j) {
+                                taskInfo.takers.add(takers.optString(j));
+                            }
+                } catch (Exception eJson) {
+                    Toast.makeText(getApplicationContext(), "ERROR: "+eJson.toString(), Toast.LENGTH_LONG).show();
+                }
+            }else{
+                Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
+            }
+            headline.setText(taskInfo.headline);
+            status.setText(taskInfo.status);
+            detail.setText(taskInfo.detail);
+            payment.setText(taskInfo.reward);
+            if(taskInfo.executor == null){
+                comment.setVisibility(View.GONE);
+            }
+            comment.setText(taskInfo.comment);
+            ((TakerListAdapter)takerList.getAdapter()).clear();
+            for (String taker : taskInfo.takers) {
+                ((TakerListAdapter)takerList.getAdapter()).add(taker);
             }
         }
     }
 
+
     /*
         添加任务条目类
         */
-    public static class UserAddTaskActionTask extends AsyncTask<Void, Void, Boolean> {
+    public class UserAddTaskActionTask extends AsyncTask<Void, Void, Boolean> {
         CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
         private final String mPk;//这个是任务的pk号
         private final String mStart_time;//格式：2016-10-11 13:00:00
@@ -189,6 +497,7 @@ public class TaskInfoDetailActivity extends Activity {
         @Override
         protected void onPostExecute(final Boolean success) {
             //mAddTaskActionTask = null;
+            Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
             if (success) {
                 try {
                     JSONArray jsonArray = new JSONArray(result);
@@ -227,7 +536,7 @@ public class TaskInfoDetailActivity extends Activity {
     /*
         添加任务类
         */
-    public static class UserAddtaskTask extends AsyncTask<Void, Void, Boolean> {
+    public class UserAddtaskTask extends AsyncTask<Void, Void, Boolean> {
         CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
         private final String mHeadline;//标题
         private final String mDetail;//内容
@@ -350,7 +659,7 @@ public class TaskInfoDetailActivity extends Activity {
         修改任务条目类
         与添加任务条目类似，注意需要任务条目的编号
         */
-    public static class UserChangeTaskActionTask extends AsyncTask<Void, Void, Boolean> {
+    public class UserChangeTaskActionTask extends AsyncTask<Void, Void, Boolean> {
         CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
         private final String mPk;//这个是TaskAction的pk号
         private final String mStart_time;
@@ -414,6 +723,7 @@ public class TaskInfoDetailActivity extends Activity {
 
         @Override
         protected void onPostExecute(final Boolean success) {
+            Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG);
             //mChangeTaskActionTask = null;
             if (success) {
                 try {
@@ -453,7 +763,7 @@ public class TaskInfoDetailActivity extends Activity {
     /*
         修改任务类，与添加任务类基本类似，只是需要指定任务编号pk
         */
-    public static class UserChangetaskTask extends AsyncTask<Void, Void, Boolean> {
+    public class UserChangetaskTask extends AsyncTask<Void, Void, Boolean> {
         CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
         private final String mPk;
         private final String mHeadline;
@@ -521,7 +831,7 @@ public class TaskInfoDetailActivity extends Activity {
         @Override
         protected void onPostExecute(final Boolean success) {
             //mChangetaskTask = null;
-
+            Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG);
             if (success) {
                 try {
                     JSONArray jsonArray = new JSONArray(result);
@@ -648,7 +958,7 @@ public class TaskInfoDetailActivity extends Activity {
         任务评价类
         发布者评价任务的完成状况并打分
         */
-    public static class UserCommenttaskTask extends AsyncTask<Void, Void, Boolean> {
+    public class UserCommenttaskTask extends AsyncTask<Void, Void, Boolean> {
         CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
         private final String mPk;//这个是任务的pk号
         private final String mScore;//打分 目前范围是1-5
@@ -719,7 +1029,7 @@ public class TaskInfoDetailActivity extends Activity {
     /*
         删除任务条目类，需要任务条目的编号
         */
-    public static class UserRemoveTaskActionTask extends AsyncTask<Void, Void, Boolean> {
+    public class UserRemoveTaskActionTask extends AsyncTask<Void, Void, Boolean> {
         CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
         private final String mPk;//TaskAction的pk号
         PrintWriter out = null;
@@ -786,7 +1096,7 @@ public class TaskInfoDetailActivity extends Activity {
     /*
         删除任务类，只需要指定任务编号
         */
-    public static class UserRemovetaskTask extends AsyncTask<Void, Void, Boolean> {
+    public class UserRemovetaskTask extends AsyncTask<Void, Void, Boolean> {
         CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
         private final String mPk;
         PrintWriter out = null;
@@ -853,7 +1163,7 @@ public class TaskInfoDetailActivity extends Activity {
     /*
         接受任务，需要被接受任务的编号
         */
-    public static class UserResponsetaskTask extends AsyncTask<Void, Void, Boolean> {
+    public class UserResponsetaskTask extends AsyncTask<Void, Void, Boolean> {
         CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
         private final String mPk;//这个是任务的pk号
         PrintWriter out = null;
@@ -920,7 +1230,7 @@ public class TaskInfoDetailActivity extends Activity {
     /*
         选择完成者类
         */
-    public static class UserSelectTaskExecutorTask extends AsyncTask<Void, Void, Boolean> {
+    public class UserSelectTaskExecutorTask extends AsyncTask<Void, Void, Boolean> {
         CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
         private final String mPk;//这个是任务的pk号
         private final String mUsername;
@@ -985,4 +1295,5 @@ public class TaskInfoDetailActivity extends Activity {
             //mSelectTaskExecutorTask = null;
         }
     }
+
 }
