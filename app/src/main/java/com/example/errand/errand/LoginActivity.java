@@ -8,8 +8,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -19,7 +17,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -140,12 +137,6 @@ public class LoginActivity extends Activity {
         super.onPostCreate(savedInstanceState);
         CookieHandler.setDefault(new CookieManager());
         new GetKey().execute();
-        SharedPreferences UserPassport = getSharedPreferences("User", MODE_PRIVATE);
-        String savedUsername = UserPassport.getString("username", null);
-        String savedPassword = UserPassport.getString("password", null);
-        if (app.key!=null && savedUsername != null && savedPassword != null) {
-            new UserLogin(savedUsername, savedPassword).execute();
-        }
     }
 
     private void setLoad(boolean load) {
@@ -165,7 +156,7 @@ public class LoginActivity extends Activity {
               if(app.key!=null){
                   cancel(true);
               }
-            setLoad(true);
+              setLoad(true);
         }
 
         @Override
@@ -210,6 +201,12 @@ public class LoginActivity extends Activity {
                 int l = result.indexOf('(');
                 int r = result.indexOf(')');
                 app.key = result.substring(l, r+1);
+                SharedPreferences UserPassport = getSharedPreferences("User", MODE_PRIVATE);
+                String savedUsername = UserPassport.getString("username", null);
+                String savedPassword = UserPassport.getString("password", null);
+                if (savedUsername != null && savedPassword != null) {
+                    new UserLogin(savedUsername, savedPassword).execute();
+                }
             }else{
                 if(result.contains("NET")){
                     Snackbar.make(loginLayout, "Network Error", Snackbar.LENGTH_LONG).setAction("Retry", new View.OnClickListener() {
@@ -229,6 +226,11 @@ public class LoginActivity extends Activity {
             }
         }
 
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+            setLoad(false);
+        }
     }
 
     private class UserLogin extends AsyncTask<Void, Void, String> {
