@@ -10,12 +10,15 @@ package com.example.errand.errand;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -25,11 +28,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.errand.errand.Objects.TaskActionInfo;
@@ -47,7 +53,9 @@ import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class TaskInfoDetailActivity extends Activity {
@@ -80,6 +88,8 @@ public class TaskInfoDetailActivity extends Activity {
     private List<String> takers;
 
     private EditText addNewAction;
+    private Calendar startTime;
+    private Calendar endTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,6 +137,14 @@ public class TaskInfoDetailActivity extends Activity {
         commentLayout = (LinearLayout) findViewById(R.id.ll_comment);
         comment = (TextView) findViewById(R.id.comment);
     }
+
+    private void disableEditText(TextInputEditText v) {
+        v.setBackground(null);
+        v.setFocusable(false);
+        v.setFocusableInTouchMode(false);
+        v.setClickable(false);
+    }
+
 
     private void enableEdit(boolean editable) {
         headline.setOnClickListener(!editable ? null : new View.OnClickListener() {
@@ -199,14 +217,70 @@ public class TaskInfoDetailActivity extends Activity {
                 AlertDialog.Builder builder = new AlertDialog.Builder(TaskInfoDetailActivity.this);
                 builder.setTitle("Add Action");
                 final LinearLayout content = (LinearLayout) getLayoutInflater().inflate(R.layout.task_action_change, null);
+                final TextInputEditText loc = (TextInputEditText) ((TextInputLayout) content.findViewById(R.id.action_change_location)).getEditText();
+                final TextInputEditText act = (TextInputEditText) ((TextInputLayout) content.findViewById(R.id.action_change_action)).getEditText();
+                final TextInputEditText st = (TextInputEditText) ((TextInputLayout) content.findViewById(R.id.action_change_start)).getEditText();
+                st.setFocusable(false);
+                st.setFocusableInTouchMode(false);
+                st.setClickable(false);
+                final TextInputEditText et = (TextInputEditText) ((TextInputLayout) content.findViewById(R.id.action_change_end)).getEditText();
+                et.setFocusable(false);
+                et.setFocusableInTouchMode(false);
+                et.setClickable(false);
+                final Button bst = (Button) content.findViewById(R.id.b_st);
+                final Button bet = (Button) content.findViewById(R.id.b_et);
+                bst.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        final Calendar currentDate = Calendar.getInstance();
+                        startTime = Calendar.getInstance();
+                        new DatePickerDialog(TaskInfoDetailActivity.this, new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                                startTime.set(year, monthOfYear, dayOfMonth);
+                                new TimePickerDialog(TaskInfoDetailActivity.this, new TimePickerDialog.OnTimeSetListener() {
+                                    @Override
+                                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                                        startTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                                        startTime.set(Calendar.MINUTE, minute);
+                                        st.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(startTime.getTime()));
+                                    }
+                                }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), true).show();
+                            }
+                        }, currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DAY_OF_MONTH)).show();
+                    }
+                });
+
+                bet.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        final Calendar currentDate = Calendar.getInstance();
+                        endTime = Calendar.getInstance();
+                        new DatePickerDialog(TaskInfoDetailActivity.this, new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                                endTime.set(year, monthOfYear, dayOfMonth);
+                                new TimePickerDialog(TaskInfoDetailActivity.this, new TimePickerDialog.OnTimeSetListener() {
+                                    @Override
+                                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                                        endTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                                        endTime.set(Calendar.MINUTE, minute);
+                                        et.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(endTime.getTime()));
+                                    }
+                                }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), true).show();
+                            }
+                        }, currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DAY_OF_MONTH)).show();
+                    }
+                });
+
                 builder.setView(content);
                 builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String location = ((TextInputLayout) content.findViewById(R.id.action_change_location)).getEditText().getText().toString();
-                        String action = ((TextInputLayout) content.findViewById(R.id.action_change_action)).getEditText().getText().toString();
-                        String start = ((TextInputLayout) content.findViewById(R.id.action_change_start)).getEditText().getText().toString();
-                        String end = ((TextInputLayout) content.findViewById(R.id.action_change_end)).getEditText().getText().toString();
+                        String location = loc != null ? loc.getText().toString() : null;
+                        String action = act != null ? act.getText().toString() : null;
+                        String start = st != null ? st.getText().toString() : null;
+                        String end = et != null ? et.getText().toString() : null;
                         new UserAddTaskActionTask(Integer.toString(pk), start, end, location, action).execute();
                     }
                 });
@@ -222,18 +296,22 @@ public class TaskInfoDetailActivity extends Activity {
                 AlertDialog.Builder builder = new AlertDialog.Builder(TaskInfoDetailActivity.this);
                 builder.setTitle("Action Info");
                 final LinearLayout content = (LinearLayout) getLayoutInflater().inflate(R.layout.task_action_change, null);
-                ((TextInputLayout) content.findViewById(R.id.action_change_location)).getEditText().setBackground(null);
-                ((TextInputLayout) content.findViewById(R.id.action_change_location)).getEditText().setFocusable(false);
-                ((TextInputLayout) content.findViewById(R.id.action_change_location)).getEditText().setText(info.place);
-                ((TextInputLayout) content.findViewById(R.id.action_change_action)).getEditText().setBackground(null);
-                ((TextInputLayout) content.findViewById(R.id.action_change_action)).getEditText().setFocusable(false);
-                ((TextInputLayout) content.findViewById(R.id.action_change_action)).getEditText().setText(info.action);
-                ((TextInputLayout) content.findViewById(R.id.action_change_start)).getEditText().setBackground(null);
-                ((TextInputLayout) content.findViewById(R.id.action_change_start)).getEditText().setFocusable(false);
-                ((TextInputLayout) content.findViewById(R.id.action_change_start)).getEditText().setText(info.startTime);
-                ((TextInputLayout) content.findViewById(R.id.action_change_end)).getEditText().setBackground(null);
-                ((TextInputLayout) content.findViewById(R.id.action_change_end)).getEditText().setFocusable(false);
-                ((TextInputLayout) content.findViewById(R.id.action_change_end)).getEditText().setText(info.endTime);
+                final TextInputEditText loc = (TextInputEditText) ((TextInputLayout) content.findViewById(R.id.action_change_location)).getEditText();
+                final TextInputEditText act = (TextInputEditText) ((TextInputLayout) content.findViewById(R.id.action_change_action)).getEditText();
+                final TextInputEditText st = (TextInputEditText) ((TextInputLayout) content.findViewById(R.id.action_change_start)).getEditText();
+                final TextInputEditText et = (TextInputEditText) ((TextInputLayout) content.findViewById(R.id.action_change_end)).getEditText();
+                final Button bst = (Button) content.findViewById(R.id.b_st);
+                final Button bet = (Button) content.findViewById(R.id.b_et);
+                disableEditText(loc);
+                disableEditText(act);
+                disableEditText(st);
+                disableEditText(et);
+                bst.setVisibility(View.GONE);
+                bet.setVisibility(View.GONE);
+                loc.setText(info.place);
+                act.setText(info.action);
+                st.setText(info.startTime);
+                et.setText(info.endTime);
                 builder.setView(content);
                 builder.setPositiveButton("OK", null);
                 AlertDialog dialog = builder.create();
@@ -246,18 +324,77 @@ public class TaskInfoDetailActivity extends Activity {
                 AlertDialog.Builder builder = new AlertDialog.Builder(TaskInfoDetailActivity.this);
                 builder.setTitle("Change Action");
                 final LinearLayout content = (LinearLayout) getLayoutInflater().inflate(R.layout.task_action_change, null);
-                ((TextInputLayout) content.findViewById(R.id.action_change_location)).getEditText().setText(info.place);
-                ((TextInputLayout) content.findViewById(R.id.action_change_action)).getEditText().setText(info.action);
-                ((TextInputLayout) content.findViewById(R.id.action_change_start)).getEditText().setText(info.startTime);
-                ((TextInputLayout) content.findViewById(R.id.action_change_end)).getEditText().setText(info.endTime);
+                final TextInputEditText loc = (TextInputEditText) ((TextInputLayout) content.findViewById(R.id.action_change_location)).getEditText();
+                final TextInputEditText act = (TextInputEditText) ((TextInputLayout) content.findViewById(R.id.action_change_action)).getEditText();
+                final TextInputEditText st = (TextInputEditText) ((TextInputLayout) content.findViewById(R.id.action_change_start)).getEditText();
+                st.setFocusable(false);
+                st.setFocusableInTouchMode(false);
+                st.setClickable(false);
+                final TextInputEditText et = (TextInputEditText) ((TextInputLayout) content.findViewById(R.id.action_change_end)).getEditText();
+                et.setFocusable(false);
+                et.setFocusableInTouchMode(false);
+                et.setClickable(false);
+                loc.setText(info.place);
+                act.setText(info.action);
+                st.setText(info.startTime);
+                et.setText(info.endTime);
+                final Button bst = (Button) content.findViewById(R.id.b_st);
+                final Button bet = (Button) content.findViewById(R.id.b_et);
+                bst.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        final Calendar currentDate = Calendar.getInstance();
+                        startTime = Calendar.getInstance();
+                        new DatePickerDialog(TaskInfoDetailActivity.this, new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                                startTime.set(year, monthOfYear, dayOfMonth);
+                                new TimePickerDialog(TaskInfoDetailActivity.this, new TimePickerDialog.OnTimeSetListener() {
+                                    @Override
+                                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                                        startTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                                        startTime.set(Calendar.MINUTE, minute);
+                                        st.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(startTime.getTime()));
+                                    }
+                                }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), true).show();
+                            }
+                        }, currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DAY_OF_MONTH)).show();
+
+                    }
+                });
+
+                bet.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        final Calendar currentDate = Calendar.getInstance();
+                        endTime = Calendar.getInstance();
+                        new DatePickerDialog(TaskInfoDetailActivity.this, new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                                endTime.set(year, monthOfYear, dayOfMonth);
+                                new TimePickerDialog(TaskInfoDetailActivity.this, new TimePickerDialog.OnTimeSetListener() {
+                                    @Override
+                                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                                        endTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                                        endTime.set(Calendar.MINUTE, minute);
+                                        et.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(endTime.getTime()));
+                                    }
+                                }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), true).show();
+                            }
+                        }, currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DAY_OF_MONTH)).show();
+
+                    }
+                });
+
+
                 builder.setView(content);
                 builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String location = ((TextInputLayout) content.findViewById(R.id.action_change_location)).getEditText().getText().toString();
-                        String action = ((TextInputLayout) content.findViewById(R.id.action_change_action)).getEditText().getText().toString();
-                        String start = ((TextInputLayout) content.findViewById(R.id.action_change_start)).getEditText().getText().toString();
-                        String end = ((TextInputLayout) content.findViewById(R.id.action_change_end)).getEditText().getText().toString();
+                        String location = loc.getText().toString();
+                        String action = act.getText().toString();
+                        String start = st.getText().toString();
+                        String end = et.getText().toString();
                         new UserChangeTaskActionTask(Integer.toString(info.actionPk), start, end, location, action).execute();
                     }
                 });
@@ -277,6 +414,16 @@ public class TaskInfoDetailActivity extends Activity {
 
     private void showExecutor(boolean show) {
         executorLayout.setVisibility(show ? View.VISIBLE : View.GONE);
+        if (show) {
+            executorLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(TaskInfoDetailActivity.this, UserInfoDetailActivity.class);
+                    intent.putExtra("username", taskInfo.executor);
+                    startActivityForResult(intent, 0);
+                }
+            });
+        }
     }
 
     private void enableDelete(boolean enable) {
@@ -1378,6 +1525,7 @@ public class TaskInfoDetailActivity extends Activity {
         @Override
         protected void onPostExecute(final Boolean success) {
             if (success) {
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 try {
                     ((TaskActionListAdapter) actionList.getAdapter()).clear();
                     JSONArray jsonArray = new JSONArray(result);
@@ -1387,8 +1535,13 @@ public class TaskInfoDetailActivity extends Activity {
                         info.actionPk = jsonObject.optInt("pk");
                         String TaskInfo = jsonObject.optString("fields");
                         jsonObject = new JSONObject(TaskInfo);
-                        info.startTime = jsonObject.optString("start_time");
-                        info.endTime = jsonObject.optString("end_time");
+                        Calendar temp = Calendar.getInstance();
+                        temp.setTime(format.parse(jsonObject.optString("start_time").replace("T", " ").replace("Z", "")));
+                        temp.add(Calendar.HOUR, 8);
+                        info.startTime = format.format(temp.getTime());
+                        temp.setTime(format.parse(jsonObject.optString("end_time").replace("T", " ").replace("Z", "")));
+                        temp.add(Calendar.HOUR, 8);
+                        info.endTime = format.format(temp.getTime());
                         info.place = jsonObject.optString("place");
                         info.action = jsonObject.optString("action");
                         info.pk = jsonObject.optInt("task_belong");
