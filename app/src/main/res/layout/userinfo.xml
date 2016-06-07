@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <RelativeLayout
         android:id="@+id/task_list_header"
@@ -20,6 +21,17 @@
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
             android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/logout"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:text="注销"
+            android:gravity="center_vertical"
+            android:layout_marginRight="10dp" />
+
     </RelativeLayout>
 
     <RelativeLayout
@@ -27,24 +39,19 @@
         android:layout_height="wrap_content"
         android:id="@+id/relativeLayout2"
         android:paddingBottom="10dp"
-        android:background="#aae3f3"
-        android:layout_below="@+id/task_list_header"
-        android:layout_alignParentLeft="true">
+        android:background="#aae3f3">
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_alignParentTop="true"
-            android:id="@+id/user">
+            android:id="@+id/user"
+            android:layout_centerHorizontal="true">
 
             <ImageView
                 android:layout_width="fill_parent"
                 android:layout_height="60dp"
                 android:id="@+id/imageView2"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
                 android:layout_marginTop="20dp"
                 android:src="@mipmap/user2" />
 
@@ -52,123 +59,150 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:text="PersonA"
-                android:id="@+id/textView4"
-                android:layout_below="@+id/imageView2"
-                android:layout_centerHorizontal="true"
+                android:id="@+id/tv_username"
                 android:layout_marginTop="10dp"
                 android:textSize="18sp"
                 android:gravity="center_horizontal" />
         </LinearLayout>
     </RelativeLayout>
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <LinearLayout
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/relativeLayout2"
-        android:layout_alignParentLeft="true"
-        android:id="@+id/l1">
+        android:layout_height="match_parent"
+        android:showDividers="middle"
+        android:divider="@drawable/divide_bar">
 
-        <TextView
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="fill_parent"
-            android:text="发布新任务"
-            android:drawableRight="@drawable/right"
-            android:id="@+id/create_task"
-            android:textSize="24dp"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp" />
-    </LinearLayout>
-    <View
-        android:id="@+id/div_tab_bar1"
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@drawable/divide_bar"
-        android:layout_below="@id/l1"/>
+            android:layout_height="wrap_content">
 
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/div_tab_bar1"
-        android:layout_alignParentLeft="true"
-        android:id="@+id/l2">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:text="发布新任务"
+                android:drawableRight="@drawable/right"
+                android:id="@+id/create_task"
+                android:textSize="24dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp" />
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="fill_parent"
-            android:text="已发布任务"
-            android:drawableRight="@drawable/right"
-            android:id="@+id/posted_task"
-            android:textSize="24dp"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp" />
-    </LinearLayout>
-    <View
-        android:id="@+id/div_tab_bar2"
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@drawable/divide_bar"
-        android:layout_below="@id/l2"/>
+            android:layout_height="wrap_content">
 
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/div_tab_bar2"
-        android:layout_alignParentLeft="true"
-        android:id="@+id/l3">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:text="已发布待指派任务"
+                android:drawableRight="@drawable/right"
+                android:id="@+id/posted_waiting_task"
+                android:textSize="24dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp" />
 
-        <TextView
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="fill_parent"
-            android:text="已领取任务"
-            android:drawableRight="@drawable/right"
-            android:id="@+id/taken_task"
-            android:textSize="24dp"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp" />
-    </LinearLayout>
-    <View
-        android:id="@+id/div_tab_bar3"
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@drawable/divide_bar"
-        android:layout_below="@id/l3"/>
+            android:layout_height="wrap_content">
 
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/div_tab_bar3"
-        android:layout_alignParentLeft="true"
-        android:id="@+id/l4">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:text="已发布待确认任务"
+                android:drawableRight="@drawable/right"
+                android:id="@+id/posted_accepted_task"
+                android:textSize="24dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp" />
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="fill_parent"
-            android:text="过往任务"
-            android:drawableRight="@drawable/right"
-            android:id="@+id/past_task"
-            android:textSize="24dp"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp" />
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:text="已领取待指派任务"
+                android:drawableRight="@drawable/right"
+                android:id="@+id/taken_task"
+                android:textSize="24dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:text="已领取被指派任务"
+                android:drawableRight="@drawable/right"
+                android:id="@+id/execute_task"
+                android:textSize="24dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:text="过往发布任务"
+                android:drawableRight="@drawable/right"
+                android:id="@+id/past_posted_task"
+                android:textSize="24dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:text="过往被指派任务"
+                android:drawableRight="@drawable/right"
+                android:id="@+id/past_executed_task"
+                android:textSize="24dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp" />
+        </LinearLayout>
     </LinearLayout>
-    <View
-        android:id="@+id/div_tab_bar4"
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@drawable/divide_bar"
-        android:layout_below="@id/l4"/>
+    </ScrollView>
 
-
-
-</RelativeLayout>
+</LinearLayout>

@@ -9,25 +9,47 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:text="快递自提点"
         android:textColor="#707070"
         android:textSize="18sp"
         android:drawableLeft="@drawable/pos"
         android:layout_weight="1"
-        android:inputType="text"
+        android:focusable="false"
+        android:clickable="false"
+        android:focusableInTouchMode="false"
         android:background="@android:color/transparent"/>
 
-    <TextView
-        android:id="@+id/period"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:gravity="center"
-        android:text="15:00-18:00"
-        android:textColor="#707070"
-        android:textSize="18sp"
-        android:layout_weight="1"
-        android:inputType="text"
-        android:background="@android:color/transparent"/>
+        android:layout_weight="1">
+
+        <TextView
+            android:id="@+id/start"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="#707070"
+            android:textSize="16sp"
+            android:focusable="false"
+            android:clickable="false"
+            android:focusableInTouchMode="false"
+            android:singleLine="true"
+            android:background="@android:color/transparent" />
+
+        <TextView
+            android:id="@+id/end"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="#707070"
+            android:textSize="16sp"
+            android:focusable="false"
+            android:clickable="false"
+            android:focusableInTouchMode="false"
+            android:singleLine="true"
+            android:background="@android:color/transparent" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/action"
@@ -35,11 +57,12 @@
         android:layout_height="match_parent"
         android:layout_gravity="right"
         android:gravity="center_vertical|right"
-        android:text="拿快递"
         android:textColor="#707070"
         android:textSize="18sp"
         android:layout_weight="1"
-        android:inputType="text"
+        android:focusable="false"
+        android:clickable="false"
+        android:focusableInTouchMode="false"
         android:background="@android:color/transparent"/>
 
 </LinearLayout>

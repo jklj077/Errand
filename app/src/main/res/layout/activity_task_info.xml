@@ -39,7 +39,19 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
             android:layout_marginRight="10dp"
-            android:drawableLeft="@drawable/confirm" />
+            android:drawableLeft="@drawable/confirm"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/delete"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:drawableLeft="@android:drawable/ic_menu_delete"
+            android:layout_toLeftOf="@+id/confirm"
+            android:visibility="gone" />
     </RelativeLayout>
 
     <LinearLayout
@@ -52,12 +64,9 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/task_list_header"
             android:orientation="horizontal"
             android:padding="10dp"
-            android:weightSum="1">
-
+            android:id="@+id/ll_owner">
 
             <include
                 android:layout_width="wrap_content"
@@ -72,7 +81,6 @@
                 android:id="@+id/status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="待领取"
                 android:textColor="#c0c0c0"
                 android:textSize="18sp"
                 android:layout_alignParentTop="true"
@@ -89,8 +97,6 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@+id/div_tab_bar2"
                 android:layout_marginLeft="10dp"
                 android:paddingBottom="5dp"
                 android:paddingTop="5dp"
@@ -99,7 +105,7 @@
             <ListView
                 android:id="@+id/taskActionListView"
                 android:layout_width="match_parent"
-                android:layout_height="70dp" />
+                android:layout_height="wrap_content" />
 
             <EditText
                 android:layout_width="match_parent"
@@ -107,6 +113,7 @@
                 android:id="@+id/addNewTaskAction"
                 android:drawableLeft="@android:drawable/ic_input_add"
                 android:hint="add new action"
+                android:focusable="false"
                 android:visibility="gone" />
         </LinearLayout>
 
@@ -118,8 +125,6 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@+id/div_tab_bar3"
                 android:layout_marginLeft="10dp"
                 android:paddingBottom="5dp"
                 android:paddingTop="5dp"
@@ -131,7 +136,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="20dp"
-                android:text="5 RMB"
                 android:textSize="24sp" />
 
         </LinearLayout>
@@ -144,8 +148,6 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@+id/div_tab_bar3"
                 android:layout_marginLeft="10dp"
                 android:paddingBottom="5dp"
                 android:paddingTop="5dp"
@@ -157,7 +159,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="20dp"
-                android:text=" "
                 android:textSize="24sp" />
 
         </LinearLayout>
@@ -170,17 +171,15 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@+id/div_tab_bar2"
                 android:layout_marginLeft="10dp"
                 android:paddingBottom="5dp"
                 android:paddingTop="5dp"
                 android:text="领取者" />
 
-            <ListView
+            <android.support.v7.widget.RecyclerView
                 android:id="@+id/user_list"
                 android:layout_width="match_parent"
-                android:layout_height="70dp" />
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
 
@@ -188,13 +187,33 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:id="@+id/ll_executor"
             android:visibility="gone">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@+id/div_tab_bar3"
+                android:layout_marginLeft="10dp"
+                android:paddingBottom="5dp"
+                android:paddingTop="5dp"
+                android:text="执行者" />
+
+            <include
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                layout="@layout/user_item" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:id="@+id/ll_comment">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:paddingBottom="5dp"
                 android:paddingTop="5dp"
@@ -206,12 +225,10 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="20dp"
-                android:text=" "
                 android:textSize="24sp" />
 
         </LinearLayout>
 
     </LinearLayout>
-
 
 </LinearLayout>
