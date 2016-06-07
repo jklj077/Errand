@@ -12,6 +12,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
@@ -131,6 +132,8 @@ public class UserInfoChangeActivity extends Activity {
         protected void onPostExecute(final Boolean success) {
             mChangeUserInfoTask = null;
             if (success) {
+               // mNickname = (EditText) findViewById(R.id.username);
+              //  naili.setText(value_naili + " + " + String.valueOf(num_naili));
                 System.out.println("ChangeUserInfo succeed");
             } else {
                 System.out.println("ChangeUserInfo Failed");
