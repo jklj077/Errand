@@ -383,6 +383,26 @@ public class TaskInfoDetailActivity extends Activity {
     private class TakerAdapter extends RecyclerView.Adapter<TakerAdapter.ViewHolder> {
         private List<String> takers;
 
+        public TakerAdapter(List<String> takers) {
+            this.takers = takers;
+        }
+
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.user, parent, false);
+            TextView username = (TextView) v.findViewById(R.id.user);
+            ViewHolder vh = new ViewHolder(v, username);
+            return vh;
+        }
+
+        public void onBindViewHolder(ViewHolder holder, int position) {
+            holder.username.setText(takers.get(position));
+        }
+
+        public int getItemCount() {
+            return takers.size();
+        }
+
         public class ViewHolder extends RecyclerView.ViewHolder {
             public TextView username;
 
@@ -410,26 +430,6 @@ public class TaskInfoDetailActivity extends Activity {
                     });
                 }
             }
-        }
-
-        public TakerAdapter(List<String> takers) {
-            this.takers = takers;
-        }
-
-        @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.user, parent, false);
-            TextView username = (TextView) v.findViewById(R.id.user);
-            ViewHolder vh = new ViewHolder(v, username);
-            return vh;
-        }
-
-        public void onBindViewHolder(ViewHolder holder, int position) {
-            holder.username.setText(takers.get(position));
-        }
-
-        public int getItemCount() {
-            return takers.size();
         }
 
     }
@@ -554,12 +554,12 @@ public class TaskInfoDetailActivity extends Activity {
         添加任务条目类
         */
     public class UserAddTaskActionTask extends AsyncTask<Void, Void, Boolean> {
-        CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
         private final String mPk;//这个是任务的pk号
         private final String mStart_time;//格式：2016-10-11 13:00:00
         private final String mEnd_time;
         private final String mPlace;//地点
         private final String mAction;//内容
+        CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
         PrintWriter out = null;
         BufferedReader in = null;
         String result = "";
@@ -663,12 +663,12 @@ public class TaskInfoDetailActivity extends Activity {
         与添加任务条目类似，注意需要任务条目的编号
         */
     public class UserChangeTaskActionTask extends AsyncTask<Void, Void, Boolean> {
-        CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
         private final String mPk;//这个是TaskAction的pk号
         private final String mStart_time;
         private final String mEnd_time;
         private final String mPlace;
         private final String mAction;
+        CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
         PrintWriter out = null;
         BufferedReader in = null;
         String result = "";
@@ -769,11 +769,11 @@ public class TaskInfoDetailActivity extends Activity {
         修改任务类，与添加任务类基本类似，只是需要指定任务编号pk
         */
     public class UserChangetaskTask extends AsyncTask<Void, Void, Boolean> {
-        CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
         private final String mPk;
         private final String mHeadline;
         private final String mDetail;
         private final String mReward;
+        CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
         PrintWriter out = null;
         BufferedReader in = null;
         String result = "";
@@ -896,8 +896,8 @@ public class TaskInfoDetailActivity extends Activity {
         任务发布者将任务关闭
         */
     public class UserClosetaskTask extends AsyncTask<Void, Void, Boolean> {
-        CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
         private final String mPk;//这个是任务的pk号
+        CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
         PrintWriter out = null;
         BufferedReader in = null;
         String result = "";
@@ -967,10 +967,10 @@ public class TaskInfoDetailActivity extends Activity {
         发布者评价任务的完成状况并打分
         */
     public class UserCommenttaskTask extends AsyncTask<Void, Void, Boolean> {
-        CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
         private final String mPk;//这个是任务的pk号
         private final String mScore;//打分 目前范围是1-5
         private final String mComment;//评价
+        CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
         PrintWriter out = null;
         BufferedReader in = null;
         String result = "";
@@ -1041,8 +1041,8 @@ public class TaskInfoDetailActivity extends Activity {
         删除任务条目类，需要任务条目的编号
         */
     public class UserRemoveTaskActionTask extends AsyncTask<Void, Void, Boolean> {
-        CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
         private final String mPk;//TaskAction的pk号
+        CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
         PrintWriter out = null;
         BufferedReader in = null;
         String result = "";
@@ -1110,8 +1110,8 @@ public class TaskInfoDetailActivity extends Activity {
         删除任务类，只需要指定任务编号
         */
     public class UserRemovetaskTask extends AsyncTask<Void, Void, Boolean> {
-        CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
         private final String mPk;
+        CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
         PrintWriter out = null;
         BufferedReader in = null;
         String result = "";
@@ -1180,8 +1180,8 @@ public class TaskInfoDetailActivity extends Activity {
         接受任务，需要被接受任务的编号
         */
     public class UserResponsetaskTask extends AsyncTask<Void, Void, Boolean> {
-        CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
         private final String mPk;//这个是任务的pk号
+        CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
         PrintWriter out = null;
         BufferedReader in = null;
         String result = "";
@@ -1249,9 +1249,9 @@ public class TaskInfoDetailActivity extends Activity {
         选择完成者类
         */
     public class UserSelectTaskExecutorTask extends AsyncTask<Void, Void, Boolean> {
-        CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
         private final String mPk;//这个是任务的pk号
         private final String mUsername;
+        CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
         PrintWriter out = null;
         BufferedReader in = null;
         String result = "";

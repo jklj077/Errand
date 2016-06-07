@@ -11,12 +11,11 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.Editable;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.TextureView;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -40,17 +39,26 @@ public class UserInfoDetailActivity extends Activity {
     private EditText sign;
     private EditText sex;
     private EditText birth;
+    private TextView post_num;
+    private TextView finish_num;
+    private RatingBar rating;
+    private Errand app;
     private UserInfoChangeActivity.UserChangeInfoTask mChangeUserInfoTask;
     private UserInfoChangeActivity.UserChangePasswordTask mChangePasswordTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        app = (Errand) getApplication();
         setContentView(R.layout.activity_user_info);
-        UserGetInfoTask taskinfo = new UserGetInfoTask();
-        taskinfo.execute();
+
         //Log.d("ERRAND", taskinfo.mPhone_number);
+
+        post_num = (TextView) findViewById(R.id.post_task_num);
+        finish_num = (TextView) findViewById(R.id.finish_task_num);
+        rating = (RatingBar) findViewById(R.id.ratingBar);
+
+
         back = (TextView) findViewById(R.id.back);
         back.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -82,6 +90,10 @@ public class UserInfoDetailActivity extends Activity {
                 finish();
             }
         });
+
+        UserGetInfoTask taskinfo = new UserGetInfoTask();
+        taskinfo.execute();
+        new UserGetUserProfileTask(app.username).execute();
 
     }
     /*
@@ -261,5 +273,117 @@ public class UserInfoDetailActivity extends Activity {
             }
         }
     }
+
+    /*
+查看指定用户名的用户信息
+注意：如果本用户和被查看的用户之间有任务关系，会返回查看用户的手机号。否则返回的手机号为空
+*/
+    public class UserGetUserProfileTask extends AsyncTask<Void, Void, Boolean> {
+        private final String mUsername;
+        CookieManager msCookieManager = (CookieManager) CookieHandler.getDefault();
+        PrintWriter out = null;
+        BufferedReader in = null;
+        String result = "";
+        private String nickname;
+        private String sex = null;
+        private String phone_number = null;
+        private String birthday = null;
+        private String signature = null;
+        private int score;
+        private int taskCompleted;
+        private int taskCreated;
+
+        UserGetUserProfileTask(String username) {
+            mUsername = username;
+        }
+
+        @Override
+
+        protected Boolean doInBackground(Void... params) {
+            String strUrl = "http://139.129.47.180:8002/Errand/getuserprofile";
+            URL Url = null;
+            try {
+                Url = new URL(strUrl);
+                URLConnection urlConnection = Url.openConnection();
+                System.out.println("Get User Profile!");
+                if (msCookieManager.getCookieStore().getCookies().size() > 0) {
+                    System.out.println(msCookieManager.getCookieStore().getCookies());
+                    urlConnection.setRequestProperty("Cookie", TextUtils.join(";", msCookieManager.getCookieStore().getCookies()));
+                }
+                urlConnection.setConnectTimeout(5000);
+                urlConnection.setReadTimeout(5000);
+                urlConnection.setDoInput(true);
+                urlConnection.setDoOutput(true);
+                urlConnection.setUseCaches(false);
+                urlConnection.setRequestProperty("accept", "*/*");
+                urlConnection.setRequestProperty("connection", "Keep-Alive");
+                urlConnection.setRequestProperty("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
+                out = new PrintWriter(new OutputStreamWriter(urlConnection.getOutputStream(), "utf-8"));
+                String param = "username=" + mUsername;
+                out.print(param);
+                out.flush();
+                in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String line;
+                while ((line = in.readLine()) != null) {
+                    result += line;
+                }
+                System.out.println("result = " + result);
+                //Thread.sleep(500);
+            } catch (Exception e) {
+                System.out.println("Get User Profile:发送POST请求出现异常！ " + e);
+                //logger.catching(e);
+                return false;
+            }
+            if (result.indexOf("FAILED") >= 0)
+                return false;
+            else
+                return true;
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            //mGetUserProfileTask = null;
+            if (success) {
+                try {
+                    JSONObject jsonObject = new JSONObject(result);
+                    nickname = jsonObject.optString("nickname");
+                    sex = jsonObject.optString("sex");
+                    phone_number = jsonObject.optString("phone_number");
+                    birthday = jsonObject.optString("birthday");
+                    signature = jsonObject.optString("signature");
+                    score = jsonObject.optInt("score");
+
+                    taskCompleted = jsonObject.optInt("taskCompleted");
+                    taskCreated = jsonObject.optInt("taskCreated");
+
+                    System.out.println("nickname = " + nickname);
+                    System.out.println("sex = " + sex);
+                    System.out.println("phone_number = " + phone_number);
+                    System.out.println("birthday = " + birthday);
+                    System.out.println("signature = " + signature);
+                    System.out.println("score = " + String.valueOf(score));
+                    System.out.println("taskCompleted = " + String.valueOf(taskCompleted));
+                    System.out.println("taskCreated = " + String.valueOf(taskCreated));
+                    System.out.println("Get User Profile Succeed");
+
+                    post_num.setText(String.valueOf(taskCreated));
+                    finish_num.setText(String.valueOf(taskCompleted));
+                    rating.setRating((float) score);
+                } catch (Exception Ejson) {
+                    System.out.println("Get User Profile: 解析JSON异常 " + Ejson);
+                }
+
+            } else {
+
+                System.out.println("Get User Profile Failed");
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            //mGetUserProfileTask = null;
+        }
+    }
+
 
 }
