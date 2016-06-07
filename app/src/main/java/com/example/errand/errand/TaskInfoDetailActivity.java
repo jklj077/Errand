@@ -434,8 +434,6 @@ public class TaskInfoDetailActivity extends Activity {
 
     }
 
-
-    // TODO: using new intefaces, now closed tasks can't return
     private class GetTaskInfo extends AsyncTask<Void, Void, String> {
         private final Integer pk;
 
@@ -445,7 +443,7 @@ public class TaskInfoDetailActivity extends Activity {
 
         @Override
         protected String doInBackground(Void... params) {
-            String strUrl = "http://139.129.47.180:8002/Errand/browsealltask";
+            String strUrl = "http://139.129.47.180:8002/Errand/seetask";
             URL Url;
             String result="";
             try {
@@ -465,7 +463,7 @@ public class TaskInfoDetailActivity extends Activity {
                 urlConnection.setRequestProperty("connection", "Keep-Alive");
                 urlConnection.setRequestProperty("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
                 PrintWriter out = new PrintWriter(new OutputStreamWriter(urlConnection.getOutputStream(), "utf-8"));
-                String param = "pk=" + (pk+1);
+                String param = "pk=" + pk;
                 out.print(param);
                 out.flush();
                 BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
@@ -507,7 +505,7 @@ public class TaskInfoDetailActivity extends Activity {
             }else{
                 Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
             }
-            if (taskInfo.pk != this.pk) {
+            if (!taskInfo.pk.equals(this.pk)) {
                 Toast.makeText(getApplicationContext(), "Server Error", Toast.LENGTH_LONG).show();
             } else {
                 ownerUsername.setText(taskInfo.creator);
