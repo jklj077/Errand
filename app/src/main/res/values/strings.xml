@@ -32,5 +32,7 @@
 
     <string name="example_validateCode">验证码</string>
     <string name="validate">提交</string>
+    <string name="task_item_avatar">avatar</string>
+    <string name="avatar">avatar</string>
 
 </resources>

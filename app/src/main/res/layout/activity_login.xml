@@ -3,12 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:android.support.design="http://schemas.android.com/apk/res-auto"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.errand.errand.LoginActivity"
-    android:background="#91dadf">
+    android:background="#91dadf"
+    android:id="@+id/loginLayout">
 
     <TextView
         android:layout_width="wrap_content"
@@ -32,76 +34,90 @@
         android:layout_centerHorizontal="true"
         android:id="@+id/linearLayout2">
 
-        <EditText
+        <android.support.design.widget.TextInputLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:inputType="textPersonName"
-            android:ems="10"
-            android:id="@+id/username"
-            android:hint="@string/user_name" />
+            android:id="@+id/usernameWrapper">
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="textPersonName"
+                android:ems="10"
+                android:hint="@string/user_name" />
+        </android.support.design.widget.TextInputLayout>
 
-        <EditText
+        <android.support.design.widget.TextInputLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:inputType="textPassword"
-            android:ems="10"
-            android:id="@+id/password"
-            android:hint="@string/example_password" />
+            android:id="@+id/passwordWrapper"
+            android.support.design:errorEnabled="true">
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="textPassword"
+                android:ems="10"
+                android:hint="@string/example_password" />
+        </android.support.design.widget.TextInputLayout>
 
         <ProgressBar
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:id="@+id/progressBar"
             android:layout_gravity="center_horizontal"
             android:indeterminate="true"
             android:indeterminateOnly="true"
             android:visibility="invisible"
-            android:layout_marginTop="10dp" />
+            android:layout_marginTop="10dp"
+            android:layout_weight="1" />
 
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="20dp">
+            android:layout_marginTop="20dp"
+            android:layout_weight="1">
 
             <Button
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/land"
                 android:id="@+id/land"
-                android:layout_gravity="center_horizontal" />
+                android:layout_weight="1" />
 
             <Button
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/register"
                 android:id="@+id/register"
-                android:layout_marginLeft="40dp" />
+                android:layout_weight="1" />
         </LinearLayout>
+
 
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/validateLayout"
-            android:visibility="invisible">
+            android:visibility="invisible"
+            android:layout_weight="1">
 
             <EditText
-                android:layout_width="92dp"
-                android:layout_height="wrap_content"
-                android:inputType="number"
-                android:ems="10"
                 android:id="@+id/validateCode"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:inputType="textPassword"
+                android:ems="4"
+                android:layout_weight="2"
                 android:hint="@string/example_validateCode" />
 
             <Button
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/validate"
                 android:id="@+id/validate"
-                android:layout_marginLeft="40dp" />
+                android:layout_weight="1" />
         </LinearLayout>
 
     </LinearLayout>

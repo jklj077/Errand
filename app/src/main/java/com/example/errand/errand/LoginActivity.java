@@ -1,17 +1,24 @@
 package com.example.errand.errand;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -27,97 +34,138 @@ import java.net.URLConnection;
 import java.util.List;
 import java.util.Map;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends Activity {
+    private RelativeLayout loginLayout;
     private ProgressBar progressBar;
     private Button land;
     private Button register;
-    private EditText username;
-    private EditText password;
+    private TextInputLayout usernameWrapper;
+    private TextInputLayout passwordWrapper;
     private LinearLayout validateLayout;
     private Button validate;
     private EditText validateCode;
+    private Errand app;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ActionBar actionBar = getSupportActionBar();
-        assert actionBar != null;
-        actionBar.hide();
+        app = (Errand) getApplication();
         setContentView(R.layout.activity_login);
 
-        CookieHandler.setDefault(new CookieManager());
-        new GetKey().execute();
-
-        SharedPreferences UserPassport = getSharedPreferences("User", MODE_PRIVATE);
-        String savedUsername = UserPassport.getString("username", null);
-        String savedPassword = UserPassport.getString("password", null);
-        if (savedUsername != null && savedPassword != null) {
-            new UserLogin(savedUsername, savedPassword).execute();
-        }
-
+        loginLayout = (RelativeLayout) findViewById(R.id.loginLayout);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        username = (EditText) findViewById(R.id.username);
-        password = (EditText) findViewById(R.id.password);
+        usernameWrapper = (TextInputLayout) findViewById(R.id.usernameWrapper);
+        passwordWrapper = (TextInputLayout) findViewById(R.id.passwordWrapper);
         register = (Button) findViewById(R.id.register);
         validate = (Button) findViewById(R.id.validate);
         validateLayout = (LinearLayout) findViewById(R.id.validateLayout);
         validateCode = (EditText) findViewById(R.id.validateCode);
         land = (Button) findViewById(R.id.land);
 
+
         land.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new UserLogin(username.getText().toString(), password.getText().toString()).execute();
+                new UserLogin(usernameWrapper.getEditText().getText().toString(), passwordWrapper.getEditText().getText().toString()).execute();
             }
         });
 
         register.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                new RegisterUser(username.getText().toString(), password.getText().toString()).execute();
+                new RegisterUser(usernameWrapper.getEditText().getText().toString(), passwordWrapper.getEditText().getText().toString()).execute();
             }
         });
 
         validate.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                new ActivateUser(username.getText().toString(), password.getText().toString(), validateCode.getText().toString()).execute();
+                new ActivateUser(usernameWrapper.getEditText().getText().toString(), passwordWrapper.getEditText().getText().toString(), validateCode.getText().toString()).execute();
+            }
+        });
+
+        usernameWrapper.getEditText().addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                passwordWrapper.setError(null);
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        passwordWrapper.getEditText().addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                passwordWrapper.setError(null);
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        validateCode.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                passwordWrapper.setError(null);
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
             }
         });
 
     }
 
-    private void showToast(String content) {
-        Toast.makeText(getApplicationContext(), content, Toast.LENGTH_LONG).show();
+    @Override
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        CookieHandler.setDefault(new CookieManager());
+        new GetKey().execute();
+        SharedPreferences UserPassport = getSharedPreferences("User", MODE_PRIVATE);
+        String savedUsername = UserPassport.getString("username", null);
+        String savedPassword = UserPassport.getString("password", null);
+        if (app.key!=null && savedUsername != null && savedPassword != null) {
+            new UserLogin(savedUsername, savedPassword).execute();
+        }
     }
 
-    private void Froze(boolean froze) {
-        if (progressBar != null) {
-            progressBar.setVisibility(froze ? View.VISIBLE : View.INVISIBLE);
-        }
-        if (username != null) {
-            username.setEnabled(!froze);
-        }
-        if (password != null) {
-            password.setEnabled(!froze);
-        }
-        if (register != null) {
-            register.setEnabled(!froze);
-        }
-        if (land != null) {
-            land.setEnabled(!froze);
-        }
-        if (validate != null) {
-            validate.setEnabled(!froze);
-        }
-        if (validateCode != null) {
-            validateCode.setEnabled(!froze);
-        }
+    private void setLoad(boolean load) {
+            progressBar.setVisibility(load ? View.VISIBLE : View.INVISIBLE);
+            usernameWrapper.setEnabled(!load);
+            passwordWrapper.setEnabled(!load);
+            register.setEnabled(!load);
+            land.setEnabled(!load);
+            validate.setEnabled(!load);
+            validateCode.setEnabled(!load);
     }
 
     private class GetKey extends AsyncTask<Void, Void, String> {
-        @Override
+          @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            Froze(true);
+              if(app.key!=null){
+                  cancel(true);
+              }
+            setLoad(true);
         }
 
         @Override
@@ -151,21 +199,36 @@ public class LoginActivity extends AppCompatActivity {
                 }
                 return result;
             } catch (Exception e) {
-                return "FAILED: " + e.toString();
+                return "FAILED: NET:" + e.toString();
             }
         }
 
         @Override
         protected void onPostExecute(final String result) {
-            Froze(false);
-            showToast(result);
+            setLoad(false);
+            if(!result.contains("FAILED")){
+                int l = result.indexOf('(');
+                int r = result.indexOf(')');
+                app.key = result.substring(l, r+1);
+            }else{
+                if(result.contains("NET")){
+                    Snackbar.make(loginLayout, "Network Error", Snackbar.LENGTH_LONG).setAction("Retry", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            new GetKey().execute();
+                        }
+                    }).show();
+                }else {
+                    Snackbar.make(loginLayout, result, Snackbar.LENGTH_LONG).setAction("Retry", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            new GetKey().execute();
+                        }
+                    }).show();
+                }
+            }
         }
 
-        @Override
-        protected void onCancelled() {
-            Froze(false);
-            showToast(this.getClass().getSimpleName() + " Cancelled");
-        }
     }
 
     private class UserLogin extends AsyncTask<Void, Void, String> {
@@ -180,7 +243,17 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            Froze(true);
+            if(app.key==null) {
+                Snackbar.make(loginLayout, "Please Get Key First", Snackbar.LENGTH_LONG).setAction("Get", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        new GetKey().execute();
+                    }
+                }).show();
+                cancel(true);
+            }else {
+                setLoad(true);
+            }
         }
 
         @Override
@@ -215,30 +288,38 @@ public class LoginActivity extends AppCompatActivity {
                 }
                 return result;
             } catch (Exception e) {
-                return "FAILED: " + e.toString();
+                return "FAILED: NET: " + e.toString();
             }
         }
 
         @Override
         protected void onPostExecute(final String result) {
-            Froze(false);
-            showToast(result);
+            setLoad(false);
             if (!result.contains("FAILED")) {
                 getSharedPreferences("User", MODE_PRIVATE).edit().putString("username", username).putString("password", password).apply();
+                app.username = username;
                 Intent i = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(i);
                 finish();
             } else {
-                if (result.contains("active")) {
-                    validateLayout.setVisibility(View.VISIBLE);
+                if(result.contains("NET")){
+                    Snackbar.make(loginLayout, "Network Error", Snackbar.LENGTH_LONG).setAction("Retry", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            new UserLogin(username, password).execute();
+                        }
+                    }).show();
+                }else if (result.contains("active")) {
+                    Snackbar.make(loginLayout, "Account Not Activated", Snackbar.LENGTH_LONG).setAction("Activate", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            validateLayout.setVisibility(View.VISIBLE);
+                        }
+                    }).show();
+                }else {
+                    passwordWrapper.setError(result);
                 }
             }
-        }
-
-        @Override
-        protected void onCancelled() {
-            Froze(false);
-            showToast(this.getClass().getSimpleName() + " Cancelled");
         }
     }
 
@@ -254,7 +335,17 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            Froze(true);
+            if(app.key==null) {
+                Snackbar.make(loginLayout, "Please Get Key First", Snackbar.LENGTH_LONG).setAction("Get", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        new GetKey().execute();
+                    }
+                }).show();
+                cancel(true);
+            }else {
+                setLoad(true);
+            }
         }
 
         @Override
@@ -288,25 +379,27 @@ public class LoginActivity extends AppCompatActivity {
                 }
                 return result;
             } catch (Exception e) {
-                return "FAILED: " + e.toString();
+                return "FAILED: NET: " + e.toString();
             }
         }
 
         @Override
         protected void onPostExecute(final String result) {
-            Froze(false);
-            showToast(result);
+            setLoad(false);
             if (!result.contains("FAILED")) {
-                land.setVisibility(View.GONE);
-                register.setVisibility(View.GONE);
-                validateLayout.setVisibility(View.VISIBLE);
+                Snackbar.make(loginLayout, "Registered", Snackbar.LENGTH_LONG).show();
+            } else {
+                if(result.contains("NET")){
+                    Snackbar.make(loginLayout, "Network Error", Snackbar.LENGTH_LONG).setAction("Retry", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            new RegisterUser(username, password).execute();
+                        }
+                    }).show();
+                }else {
+                    passwordWrapper.setError(result);
+                }
             }
-        }
-
-        @Override
-        protected void onCancelled() {
-            Froze(false);
-            showToast(this.getClass().getSimpleName() + " Cancelled");
         }
     }
 
@@ -324,7 +417,7 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            Froze(true);
+            setLoad(true);
         }
 
         @Override
@@ -358,25 +451,28 @@ public class LoginActivity extends AppCompatActivity {
                 }
                 return result;
             } catch (Exception e) {
-                return "FAILED: " + e.toString();
+                return "FAILED: NET: " + e.toString();
             }
         }
 
         @Override
         protected void onPostExecute(final String result) {
-            Froze(false);
-            showToast(result);
+            setLoad(false);
             if (!result.contains("FAILED")) {
                 validateLayout.setVisibility(View.INVISIBLE);
-                land.setVisibility(View.VISIBLE);
-                register.setVisibility(View.VISIBLE);
+                Snackbar.make(loginLayout, "Validated", Snackbar.LENGTH_LONG).show();
+            }else{
+                if(result.contains("NET")){
+                    Snackbar.make(loginLayout, "Network Error", Snackbar.LENGTH_LONG).setAction("Retry", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            new RegisterUser(username, password).execute();
+                        }
+                    }).show();
+                }else {
+                    passwordWrapper.setError(result);
+                }
             }
-        }
-
-        @Override
-        protected void onCancelled() {
-            Froze(false);
-            showToast(this.getClass().getSimpleName() + " Cancelled");
         }
     }
 }

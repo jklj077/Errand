@@ -8,29 +8,25 @@ package com.example.errand.errand;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
+
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private TextView list;
     private TextView rank;
     private TextView info;
-    private FrameLayout frame;
 
-    private MainTaskListFragment frame_list;
-    private MainRankListFragment frame_rank;
-    private MainUserInfoFragment frame_info;
+    private TaskListFragment frame_list;
+    private RankListFragment frame_rank;
+    private UserInfoFragment frame_info;
     private FragmentManager framemanager;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.hide();
         setContentView(R.layout.activity_main);
 
         framemanager = getFragmentManager();
@@ -46,7 +42,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         list.setOnClickListener(this);
         rank.setOnClickListener(this);
         info.setOnClickListener(this);
-
     }
 
     private void setSelected() {
@@ -70,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 setSelected();
                 list.setSelected(true);
                 if (frame_list == null) {
-                    frame_list = new MainTaskListFragment();
+                    frame_list = new TaskListFragment();
                     fTransaction.add(R.id.content, frame_list);
                 } else {
                     fTransaction.show(frame_list);
@@ -80,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 setSelected();
                 rank.setSelected(true);
                 if (frame_rank == null) {
-                    frame_rank = new MainRankListFragment();
+                    frame_rank = new RankListFragment();
                     fTransaction.add(R.id.content, frame_rank);
                 } else {
                     fTransaction.show(frame_rank);
@@ -90,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 setSelected();
                 info.setSelected(true);
                 if (frame_info == null) {
-                    frame_info = new MainUserInfoFragment();
+                    frame_info = new UserInfoFragment();
                     fTransaction.add(R.id.content, frame_info);
                 } else {
                     fTransaction.show(frame_info);

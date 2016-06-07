@@ -16,7 +16,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="@string/user_rank"
-            android:id="@+id/textView2"
+            android:id="@+id/healine"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
             android:textSize="20sp" />

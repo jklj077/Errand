@@ -11,7 +11,7 @@
     tools:context=".UserInfoChangeActivity">
 
     <RelativeLayout
-        android:id="@+id/task_list"
+        android:id="@+id/task_list_header"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:background="#91dadf"
@@ -54,7 +54,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/task_list"
+        android:layout_below="@+id/task_list_header"
         android:text="..."
         android:textSize="24sp" />
 

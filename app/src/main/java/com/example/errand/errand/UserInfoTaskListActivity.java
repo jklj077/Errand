@@ -52,7 +52,7 @@ public class UserInfoTaskListActivity extends Activity {
         });
 
 
-        refresh();
+//        refresh();
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -66,24 +66,24 @@ public class UserInfoTaskListActivity extends Activity {
     }
 
 
-    public void refresh()
-    {
-        mylist = new ArrayList< HashMap<String, String> >();
-        for (int i=0;i<item_num;i++)
-        {
-            taskcontent="求帮忙拿快递！！";
-            taskuser="personA";
-            taskpay="      5RMB";
-            HashMap<String, String> map = new HashMap<String, String>();
-            map.put("task_item_content", taskcontent);
-            map.put("task_item_person", taskuser);
-            map.put("task_item_pay", taskpay);
-            mylist.add(map);
-        }
-        mSchedule = new SimpleAdapter( this, mylist, R.layout.tasklist_item,
-                new String[] {"task_item_content", "task_item_person" , "task_item_pay"},
-                new int[]{R.id.task_item_content,R.id.task_item_person, R.id.task_item_pay});
-        listview.setAdapter(mSchedule);
-
-    }
+//    public void refresh()
+//    {
+//        mylist = new ArrayList< HashMap<String, String> >();
+//        for (int i=0;i<item_num;i++)
+//        {
+//            taskcontent="求帮忙拿快递！！";
+//            taskuser="personA";
+//            taskpay="      5RMB";
+//            HashMap<String, String> map = new HashMap<String, String>();
+//            map.put("task_item_content", taskcontent);
+//            map.put("task_item_person", taskuser);
+//            map.put("task_item_pay", taskpay);
+//            mylist.add(map);
+//        }
+//        mSchedule = new SimpleAdapter( this, mylist, R.layout.tasklist_item,
+//                new String[] {"task_item_content", "task_item_person" , "task_item_pay"},
+//                new int[]{R.id.task_item_content,R.id.task_item_person, R.id.task_item_pay});
+//        listview.setAdapter(mSchedule);
+//
+//    }
 }
