@@ -51,12 +51,13 @@ public class UserInfoDetailActivity extends Activity {
         super.onCreate(savedInstanceState);
         app = (Errand) getApplication();
         setContentView(R.layout.activity_user_info);
-
+        String user = getIntent().getStringExtra("username");
         //Log.d("ERRAND", taskinfo.mPhone_number);
 
         post_num = (TextView) findViewById(R.id.post_task_num);
         finish_num = (TextView) findViewById(R.id.finish_task_num);
         rating = (RatingBar) findViewById(R.id.ratingBar);
+        phone = (EditText) findViewById(R.id.phone);
 
 
         back = (TextView) findViewById(R.id.back);
@@ -90,10 +91,25 @@ public class UserInfoDetailActivity extends Activity {
                 finish();
             }
         });
+        if(!app.username.equals(user) && user != null){
+            nickname.setClickable(false);
+            nickname.setEnabled(false);
+            sex.setClickable(false);
+            sex.setEnabled(false);
+            birth.setClickable(false);
+            birth.setEnabled(false);
+            sign.setClickable(false);
+            sign.setEnabled(false);
+            phone.setClickable(false);
+            phone.setEnabled(false);
+            new UserGetUserProfileTask(user).execute();
 
-        UserGetInfoTask taskinfo = new UserGetInfoTask();
-        taskinfo.execute();
-        new UserGetUserProfileTask(app.username).execute();
+        }
+        else {
+            UserGetInfoTask taskinfo = new UserGetInfoTask();
+            taskinfo.execute();
+            new UserGetUserProfileTask(app.username).execute();
+        }
 
     }
     /*
@@ -255,7 +271,6 @@ public class UserInfoDetailActivity extends Activity {
                     System.out.println("birthday = " + mBirthday);
                     System.out.println("signature = " + mSignature);
                     System.out.println("Get My User Info succeed");
-                    phone = (EditText) findViewById(R.id.phone);
                     phone.setText(mPhone_number);
                     sign = (EditText)findViewById(R.id.sign);
                     sign.setText(mSignature);
@@ -284,11 +299,11 @@ public class UserInfoDetailActivity extends Activity {
         PrintWriter out = null;
         BufferedReader in = null;
         String result = "";
-        private String nickname;
-        private String sex = null;
+        private String znickname;
+        private String zsex = null;
         private String phone_number = null;
-        private String birthday = null;
-        private String signature = null;
+        private String zbirthday = null;
+        private String zsignature = null;
         private int score;
         private int taskCompleted;
         private int taskCreated;
@@ -346,26 +361,35 @@ public class UserInfoDetailActivity extends Activity {
             if (success) {
                 try {
                     JSONObject jsonObject = new JSONObject(result);
-                    nickname = jsonObject.optString("nickname");
-                    sex = jsonObject.optString("sex");
+                    znickname = jsonObject.optString("nickname");
+                    zsex = jsonObject.optString("sex");
                     phone_number = jsonObject.optString("phone_number");
-                    birthday = jsonObject.optString("birthday");
-                    signature = jsonObject.optString("signature");
+                    zbirthday = jsonObject.optString("birthday");
+                    zsignature = jsonObject.optString("signature");
                     score = jsonObject.optInt("score");
 
                     taskCompleted = jsonObject.optInt("taskCompleted");
                     taskCreated = jsonObject.optInt("taskCreated");
 
-                    System.out.println("nickname = " + nickname);
-                    System.out.println("sex = " + sex);
+                    System.out.println("nickname = " + znickname);
+                    System.out.println("sex = " + zsex);
                     System.out.println("phone_number = " + phone_number);
-                    System.out.println("birthday = " + birthday);
-                    System.out.println("signature = " + signature);
+                    System.out.println("birthday = " + zbirthday);
+                    System.out.println("signature = " + zsignature);
                     System.out.println("score = " + String.valueOf(score));
                     System.out.println("taskCompleted = " + String.valueOf(taskCompleted));
                     System.out.println("taskCreated = " + String.valueOf(taskCreated));
                     System.out.println("Get User Profile Succeed");
-
+                    phone = (EditText) findViewById(R.id.phone);
+                    phone.setText(phone_number);
+                    sign = (EditText)findViewById(R.id.sign);
+                    sign.setText(zsignature);
+                    sex = (EditText)findViewById(R.id.sex);
+                    sex.setText(zsex);
+                    birth = (EditText)findViewById(R.id.birth);
+                    birth.setText(zbirthday);
+                    nickname = (EditText)findViewById(R.id.nickname);
+                    nickname.setText(znickname);
                     post_num.setText(String.valueOf(taskCreated));
                     finish_num.setText(String.valueOf(taskCompleted));
                     rating.setRating((float) score);
