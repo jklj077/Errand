@@ -49,29 +49,33 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
             android:layout_marginRight="10dp"
-            android:drawableLeft="@android:drawable/ic_menu_delete"
             android:layout_toLeftOf="@+id/confirm"
+            android:drawableLeft="@android:drawable/ic_menu_delete"
             android:visibility="gone" />
     </RelativeLayout>
 
-    <LinearLayout
-        android:orientation="vertical"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:showDividers="middle"
-        android:divider="@drawable/divide_bar">
+        android:fillViewport="true">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@drawable/divide_bar"
+        android:orientation="vertical"
+        android:showDividers="middle">
 
         <RelativeLayout
+            android:id="@+id/ll_owner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:padding="10dp"
-            android:id="@+id/ll_owner">
+            android:padding="10dp">
 
             <include
+                layout="@layout/user_item"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                layout="@layout/user_item"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
                 android:layout_toLeftOf="@+id/status"
@@ -81,18 +85,18 @@
                 android:id="@+id/status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#c0c0c0"
-                android:textSize="18sp"
-                android:layout_alignParentTop="true"
                 android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
                 android:layout_centerVertical="true"
-                android:gravity="center_vertical" />
+                android:gravity="center_vertical"
+                android:textColor="#c0c0c0"
+                android:textSize="18sp" />
         </RelativeLayout>
 
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -108,19 +112,19 @@
                 android:layout_height="wrap_content" />
 
             <EditText
+                android:id="@+id/addNewTaskAction"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/addNewTaskAction"
                 android:drawableLeft="@android:drawable/ic_input_add"
-                android:hint="add new action"
                 android:focusable="false"
+                android:hint="add new action"
                 android:visibility="gone" />
         </LinearLayout>
 
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -141,9 +145,9 @@
         </LinearLayout>
 
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -164,9 +168,9 @@
         </LinearLayout>
 
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -184,10 +188,10 @@
         </LinearLayout>
 
         <LinearLayout
-            android:orientation="vertical"
+            android:id="@+id/ll_executor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/ll_executor"
+            android:orientation="vertical"
             android:visibility="gone">
 
             <TextView
@@ -199,17 +203,17 @@
                 android:text="执行者" />
 
             <include
+                layout="@layout/user_item"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                layout="@layout/user_item" />
+                android:layout_height="wrap_content" />
         </LinearLayout>
 
         <LinearLayout
-            android:orientation="vertical"
+            android:id="@+id/ll_comment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:id="@+id/ll_comment">
+            android:orientation="vertical"
+            android:visibility="gone">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -230,5 +234,6 @@
         </LinearLayout>
 
     </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

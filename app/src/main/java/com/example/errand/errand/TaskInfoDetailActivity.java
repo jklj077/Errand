@@ -22,6 +22,7 @@ import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -67,10 +68,8 @@ public class TaskInfoDetailActivity extends Activity {
 
     private TextView headline;
     private TextView ownerUsername;
-    private TextView ownerLevel;
     private LinearLayout executorLayout;
     private TextView executorUsername;
-    private TextView executorLevel;
     private TextView status;
     private TextView payment;
     private TextView detail;
@@ -91,12 +90,24 @@ public class TaskInfoDetailActivity extends Activity {
     private Calendar startTime;
     private Calendar endTime;
 
+    private SimpleDateFormat format;
+
+    public static void disableEditText(TextInputEditText v, boolean isEdit) {
+        if (!isEdit) {
+            v.setBackground(null);
+        }
+        v.setFocusable(false);
+        v.setFocusableInTouchMode(false);
+        v.setClickable(false);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         pk = getIntent().getIntExtra("pk", -1);
         isMine = getIntent().getBooleanExtra("isMine", false);
         app = (Errand) getApplication();
+        format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         setContentView(R.layout.activity_task_info);
 
         headline = (TextView) findViewById(R.id.healine);
@@ -113,7 +124,6 @@ public class TaskInfoDetailActivity extends Activity {
         });
 
         ownerUsername = (TextView) findViewById(R.id.ll_owner).findViewById(R.id.user_item_username);
-        ownerLevel = (TextView) findViewById(R.id.ll_owner).findViewById(R.id.user_item_level);
         status = (TextView) findViewById(R.id.status);
 
         payment = (TextView) findViewById(R.id.reward);
@@ -132,19 +142,10 @@ public class TaskInfoDetailActivity extends Activity {
 
         executorLayout = (LinearLayout) findViewById(R.id.ll_executor);
         executorUsername = (TextView) findViewById(R.id.ll_executor).findViewById(R.id.user_item_username);
-        executorLevel = (TextView) findViewById(R.id.ll_executor).findViewById(R.id.user_item_level);
 
         commentLayout = (LinearLayout) findViewById(R.id.ll_comment);
         comment = (TextView) findViewById(R.id.comment);
     }
-
-    private void disableEditText(TextInputEditText v) {
-        v.setBackground(null);
-        v.setFocusable(false);
-        v.setFocusableInTouchMode(false);
-        v.setClickable(false);
-    }
-
 
     private void enableEdit(boolean editable) {
         headline.setOnClickListener(!editable ? null : new View.OnClickListener() {
@@ -220,30 +221,26 @@ public class TaskInfoDetailActivity extends Activity {
                 final TextInputEditText loc = (TextInputEditText) ((TextInputLayout) content.findViewById(R.id.action_change_location)).getEditText();
                 final TextInputEditText act = (TextInputEditText) ((TextInputLayout) content.findViewById(R.id.action_change_action)).getEditText();
                 final TextInputEditText st = (TextInputEditText) ((TextInputLayout) content.findViewById(R.id.action_change_start)).getEditText();
-                st.setFocusable(false);
-                st.setFocusableInTouchMode(false);
-                st.setClickable(false);
                 final TextInputEditText et = (TextInputEditText) ((TextInputLayout) content.findViewById(R.id.action_change_end)).getEditText();
-                et.setFocusable(false);
-                et.setFocusableInTouchMode(false);
-                et.setClickable(false);
                 final Button bst = (Button) content.findViewById(R.id.b_st);
                 final Button bet = (Button) content.findViewById(R.id.b_et);
+                disableEditText(st, true);
+                disableEditText(et, true);
                 bst.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         final Calendar currentDate = Calendar.getInstance();
                         startTime = Calendar.getInstance();
-                        new DatePickerDialog(TaskInfoDetailActivity.this, new DatePickerDialog.OnDateSetListener() {
+                        new MyDatePickDialog(TaskInfoDetailActivity.this, new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                                 startTime.set(year, monthOfYear, dayOfMonth);
-                                new TimePickerDialog(TaskInfoDetailActivity.this, new TimePickerDialog.OnTimeSetListener() {
+                                new MyTimePickDialog(TaskInfoDetailActivity.this, new TimePickerDialog.OnTimeSetListener() {
                                     @Override
                                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                                         startTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
                                         startTime.set(Calendar.MINUTE, minute);
-                                        st.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(startTime.getTime()));
+                                        st.setText(format.format(startTime.getTime()));
                                     }
                                 }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), true).show();
                             }
@@ -256,16 +253,16 @@ public class TaskInfoDetailActivity extends Activity {
                     public void onClick(View v) {
                         final Calendar currentDate = Calendar.getInstance();
                         endTime = Calendar.getInstance();
-                        new DatePickerDialog(TaskInfoDetailActivity.this, new DatePickerDialog.OnDateSetListener() {
+                        new MyDatePickDialog(TaskInfoDetailActivity.this, new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                                 endTime.set(year, monthOfYear, dayOfMonth);
-                                new TimePickerDialog(TaskInfoDetailActivity.this, new TimePickerDialog.OnTimeSetListener() {
+                                new MyTimePickDialog(TaskInfoDetailActivity.this, new TimePickerDialog.OnTimeSetListener() {
                                     @Override
                                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                                         endTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
                                         endTime.set(Calendar.MINUTE, minute);
-                                        et.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(endTime.getTime()));
+                                        et.setText(format.format(endTime.getTime()));
                                     }
                                 }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), true).show();
                             }
@@ -302,10 +299,10 @@ public class TaskInfoDetailActivity extends Activity {
                 final TextInputEditText et = (TextInputEditText) ((TextInputLayout) content.findViewById(R.id.action_change_end)).getEditText();
                 final Button bst = (Button) content.findViewById(R.id.b_st);
                 final Button bet = (Button) content.findViewById(R.id.b_et);
-                disableEditText(loc);
-                disableEditText(act);
-                disableEditText(st);
-                disableEditText(et);
+                disableEditText(loc, false);
+                disableEditText(act, false);
+                disableEditText(st, false);
+                disableEditText(et, false);
                 bst.setVisibility(View.GONE);
                 bet.setVisibility(View.GONE);
                 loc.setText(info.place);
@@ -327,13 +324,9 @@ public class TaskInfoDetailActivity extends Activity {
                 final TextInputEditText loc = (TextInputEditText) ((TextInputLayout) content.findViewById(R.id.action_change_location)).getEditText();
                 final TextInputEditText act = (TextInputEditText) ((TextInputLayout) content.findViewById(R.id.action_change_action)).getEditText();
                 final TextInputEditText st = (TextInputEditText) ((TextInputLayout) content.findViewById(R.id.action_change_start)).getEditText();
-                st.setFocusable(false);
-                st.setFocusableInTouchMode(false);
-                st.setClickable(false);
                 final TextInputEditText et = (TextInputEditText) ((TextInputLayout) content.findViewById(R.id.action_change_end)).getEditText();
-                et.setFocusable(false);
-                et.setFocusableInTouchMode(false);
-                et.setClickable(false);
+                disableEditText(st, true);
+                disableEditText(et, true);
                 loc.setText(info.place);
                 act.setText(info.action);
                 st.setText(info.startTime);
@@ -345,16 +338,16 @@ public class TaskInfoDetailActivity extends Activity {
                     public void onClick(View v) {
                         final Calendar currentDate = Calendar.getInstance();
                         startTime = Calendar.getInstance();
-                        new DatePickerDialog(TaskInfoDetailActivity.this, new DatePickerDialog.OnDateSetListener() {
+                        new MyDatePickDialog(TaskInfoDetailActivity.this, new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                                 startTime.set(year, monthOfYear, dayOfMonth);
-                                new TimePickerDialog(TaskInfoDetailActivity.this, new TimePickerDialog.OnTimeSetListener() {
+                                new MyTimePickDialog(TaskInfoDetailActivity.this, new TimePickerDialog.OnTimeSetListener() {
                                     @Override
                                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                                         startTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
                                         startTime.set(Calendar.MINUTE, minute);
-                                        st.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(startTime.getTime()));
+                                        st.setText(format.format(startTime.getTime()));
                                     }
                                 }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), true).show();
                             }
@@ -368,16 +361,16 @@ public class TaskInfoDetailActivity extends Activity {
                     public void onClick(View v) {
                         final Calendar currentDate = Calendar.getInstance();
                         endTime = Calendar.getInstance();
-                        new DatePickerDialog(TaskInfoDetailActivity.this, new DatePickerDialog.OnDateSetListener() {
+                        new MyDatePickDialog(TaskInfoDetailActivity.this, new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                                 endTime.set(year, monthOfYear, dayOfMonth);
-                                new TimePickerDialog(TaskInfoDetailActivity.this, new TimePickerDialog.OnTimeSetListener() {
+                                new MyTimePickDialog(TaskInfoDetailActivity.this, new TimePickerDialog.OnTimeSetListener() {
                                     @Override
                                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                                         endTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
                                         endTime.set(Calendar.MINUTE, minute);
-                                        et.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(endTime.getTime()));
+                                        et.setText(format.format(endTime.getTime()));
                                     }
                                 }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), true).show();
                             }
@@ -410,7 +403,13 @@ public class TaskInfoDetailActivity extends Activity {
             }
         });
         takerView.setClickable(editable);
+        takerView.setFocusable(editable);
+        takerView.setFocusableInTouchMode(editable);
+        if (!editable) {
+            takerView.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
+        }
     }
+
 
     private void showExecutor(boolean show) {
         executorLayout.setVisibility(show ? View.VISIBLE : View.GONE);
@@ -458,12 +457,22 @@ public class TaskInfoDetailActivity extends Activity {
                 AlertDialog.Builder builder = new AlertDialog.Builder(TaskInfoDetailActivity.this);
                 builder.setTitle("Comment");
                 LinearLayout content = new LinearLayout(getApplicationContext());
-                final EditText comment = new EditText(getApplicationContext());
+                content.setOrientation(LinearLayout.VERTICAL);
+                final TextInputEditText comment = new TextInputEditText(getApplicationContext());
                 comment.setTextColor(Color.BLACK);
+                comment.setInputType(InputType.TYPE_TEXT_FLAG_IME_MULTI_LINE);
+                comment.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                final TextInputLayout inputLayout = new TextInputLayout(getApplicationContext());
+                inputLayout.setHint("评价");
+                inputLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                inputLayout.addView(comment);
                 final RatingBar ratingBar = new RatingBar(getApplicationContext());
                 ratingBar.setStepSize(1);
-                content.addView(ratingBar, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-                content.addView(comment, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                ratingBar.setNumStars(5);
+                ratingBar.setMax(5);
+                ratingBar.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                content.addView(ratingBar);
+                content.addView(inputLayout);
                 builder.setView(content);
                 builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                     @Override
@@ -497,6 +506,36 @@ public class TaskInfoDetailActivity extends Activity {
         new UserGetTaskActionTask(Integer.toString(pk)).execute();
     }
 
+    public static class MyDatePickDialog extends DatePickerDialog {
+
+        public MyDatePickDialog(Context context, OnDateSetListener callBack, int year, int monthOfYear, int dayOfMonth) {
+            super(context, callBack, year, monthOfYear, dayOfMonth);
+        }
+
+        public MyDatePickDialog(Context context, int theme, OnDateSetListener callBack, int year, int monthOfYear, int dayOfMonth) {
+            super(context, theme, callBack, year, monthOfYear, dayOfMonth);
+        }
+
+        @Override
+        protected void onStop() {
+
+        }
+    }
+
+    public static class MyTimePickDialog extends TimePickerDialog {
+        public MyTimePickDialog(Context context, OnTimeSetListener listener, int hourOfDay, int minute, boolean is24HourView) {
+            super(context, listener, hourOfDay, minute, is24HourView);
+        }
+
+        public MyTimePickDialog(Context context, int themeResId, OnTimeSetListener listener, int hourOfDay, int minute, boolean is24HourView) {
+            super(context, themeResId, listener, hourOfDay, minute, is24HourView);
+        }
+
+        @Override
+        protected void onStop() {
+        }
+    }
+
     private class TaskActionListAdapter extends ArrayAdapter<TaskActionInfo> {
         private int resource;
         public TaskActionListAdapter(Context context, int resource, List<TaskActionInfo> objects) {
@@ -523,6 +562,9 @@ public class TaskInfoDetailActivity extends Activity {
             end.setText(info.endTime);
             TextView action = (TextView) taskActionItemView.findViewById(R.id.action);
             action.setText(info.action);
+            taskActionItemView.measure(View.MeasureSpec.makeMeasureSpec(
+                    View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED),
+                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
             return taskActionItemView;
         }
     }
@@ -642,60 +684,62 @@ public class TaskInfoDetailActivity extends Activity {
                     taskInfo.reward = jsonObject.optString("reward");
                     taskInfo.comment = jsonObject.optString("comment");
                     taskInfo.score = jsonObject.optInt("score");
-                            JSONArray takers = jsonObject.optJSONArray("response_accounts");
-                            for (int j = 0; j < takers.length(); ++j) {
-                                taskInfo.takers.add(takers.optString(j));
+                    JSONArray mtakers = jsonObject.optJSONArray("response_accounts");
+                    for (int j = 0; j < mtakers.length(); ++j) {
+                        taskInfo.takers.add(mtakers.optString(j));
                             }
+                    ownerUsername.setText(taskInfo.creator);
+                    headline.setText(taskInfo.headline);
+                    if (taskInfo.status.equals("A")) {
+                        status.setText("已指派");
+                        enableComment(false, false);
+                        enableDelete(false);
+                        enableEdit(false);
+                        setConfirm(isMine);
+                        showExecutor(true);
+                    } else if (taskInfo.status.equals("W")) {
+                        status.setText("待指派");
+                        enableComment(false, false);
+                        showExecutor(false);
+                        setConfirm(!isMine && !taskInfo.takers.contains(app.username));
+                        if (taskInfo.takers.size() == 0) {
+                            enableEdit(isMine);
+                            enableDelete(isMine);
+                        } else {
+                            enableEdit(false);
+                            enableDelete(false);
+                        }
+                    } else if (taskInfo.status.equals("C")) {
+                        status.setText("已结束");
+                        if (taskInfo.executor.isEmpty()) {
+                            showExecutor(false);
+                            enableComment(false, false);
+                        } else {
+                            showExecutor(true);
+                            enableComment(true, taskInfo.comment.isEmpty());
+                        }
+                        enableDelete(true);
+                        enableEdit(false);
+                        setConfirm(false);
+                    }
+                    detail.setText(taskInfo.detail);
+                    payment.setText(taskInfo.reward);
+                    comment.setText(taskInfo.comment);
+                    executorUsername.setText(taskInfo.executor);
+                    takers.clear();
+                    for (String taker : taskInfo.takers) {
+                        takers.add(taker);
+                    }
                 } catch (Exception eJson) {
                     Toast.makeText(getApplicationContext(), "ERROR: "+eJson.toString(), Toast.LENGTH_LONG).show();
                 }
             }else{
-                Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "获取任务信息失败", Toast.LENGTH_LONG).show();
             }
-            if (!taskInfo.pk.equals(this.pk)) {
-                Toast.makeText(getApplicationContext(), "Server Error", Toast.LENGTH_LONG).show();
-            } else {
-                ownerUsername.setText(taskInfo.creator);
-                headline.setText(taskInfo.headline);
-                if (taskInfo.status.equals("A")) {
-                    status.setText("已指派");
-                    enableComment(false, false);
-                    enableDelete(false);
-                    enableEdit(false);
-                    setConfirm(isMine);
-                    showExecutor(true);
-                } else if (taskInfo.status.equals("W")) {
-                    status.setText("待指派");
-                    enableComment(false, false);
-                    showExecutor(false);
-                    setConfirm(!isMine && !taskInfo.takers.contains(app.username));
-                    if (taskInfo.takers.size() == 0) {
-                        enableEdit(isMine);
-                        enableDelete(isMine);
-                    } else {
-                        enableEdit(false);
-                        enableDelete(false);
-                    }
-                } else if (taskInfo.status.equals("C")) {
-                    status.setText("已结束");
-                    enableComment(true, isMine);
-                    showExecutor(false);
-                    enableDelete(true);
-                    enableEdit(false);
-                    setConfirm(false);
-                }
-                detail.setText(taskInfo.detail);
-                payment.setText(taskInfo.reward);
-                comment.setText(taskInfo.comment);
-                executorUsername.setText(taskInfo.executor);
-                takers.clear();
-                for (String taker : taskInfo.takers) {
-                    takers.add(taker);
-                }
-            }
+
+
         }
     }
-
 
     /*
         添加任务条目类
@@ -766,7 +810,7 @@ public class TaskInfoDetailActivity extends Activity {
         @Override
         protected void onPostExecute(final Boolean success) {
             //mAddTaskActionTask = null;
-            Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
+            //Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
             if (success) {
                 try {
                     JSONArray jsonArray = new JSONArray(result);
@@ -791,10 +835,13 @@ public class TaskInfoDetailActivity extends Activity {
                     System.out.println("Add Task Action:解析JSON异常" + ejson);
                 }
                 System.out.println("Add Task Action succeed");
+                Toast.makeText(getApplicationContext(), "添加成功", Toast.LENGTH_LONG).show();
+                Refresh();
             } else {
+                Toast.makeText(getApplicationContext(), "添加失败", Toast.LENGTH_LONG).show();
                 System.out.println("Add Task Action Failed!");
             }
-            Refresh();
+
         }
 
         @Override
@@ -802,8 +849,6 @@ public class TaskInfoDetailActivity extends Activity {
             //mAddTaskActionTask = null;
         }
     }
-
-
 
     /*
         修改任务条目类
@@ -874,7 +919,7 @@ public class TaskInfoDetailActivity extends Activity {
 
         @Override
         protected void onPostExecute(final Boolean success) {
-            Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
+            //Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
             //mChangeTaskActionTask = null;
             if (success) {
                 try {
@@ -899,11 +944,14 @@ public class TaskInfoDetailActivity extends Activity {
                     System.out.println("Chanege Task Action:解析JSON异常" + ejson);
                 }
                 System.out.println("Change Task Action succeed");
+                Toast.makeText(getApplicationContext(), "修改失败", Toast.LENGTH_LONG).show();
+                Refresh();
 
             } else {
+                Toast.makeText(getApplicationContext(), "修改成功", Toast.LENGTH_LONG).show();
                 System.out.println("Fuck!");
             }
-            Refresh();
+
         }
 
         @Override
@@ -983,7 +1031,7 @@ public class TaskInfoDetailActivity extends Activity {
 
         @Override
         protected void onPostExecute(final Boolean success) {
-            Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
+            //Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
             if (success) {
                 try {
                     JSONArray jsonArray = new JSONArray(result);
@@ -1024,10 +1072,12 @@ public class TaskInfoDetailActivity extends Activity {
                 } catch (Exception ejson) {
                     System.out.println("Change Task:解析JSON异常" + ejson);
                 }
-
+                Toast.makeText(getApplicationContext(), "修改成功", Toast.LENGTH_LONG).show();
+                Refresh();
                 System.out.println("Change Task succeed");
 
             } else {
+                Toast.makeText(getApplicationContext(), "修改失败", Toast.LENGTH_LONG).show();
                 System.out.println("Change Task Failed!");
             }
         }
@@ -1093,14 +1143,17 @@ public class TaskInfoDetailActivity extends Activity {
 
         @Override
         protected void onPostExecute(final Boolean success) {
-            Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
+            //Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
             //mClosetaskTask = null;
             if (success) {
+                Toast.makeText(getApplicationContext(), "任务确认成功", Toast.LENGTH_LONG).show();
                 System.out.println("Close Task succeed");
+                Refresh();
             } else {
+                Toast.makeText(getApplicationContext(), "任务确认失败", Toast.LENGTH_LONG).show();
                 System.out.println("Close Task Failed");
             }
-            Refresh();
+
         }
 
         @Override
@@ -1168,14 +1221,17 @@ public class TaskInfoDetailActivity extends Activity {
 
         @Override
         protected void onPostExecute(final Boolean success) {
-            Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
+            //Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
             //mCommenttaskTask = null;
             if (success) {
+                Refresh();
+                Toast.makeText(getApplicationContext(), "评价成功", Toast.LENGTH_LONG).show();
                 System.out.println("Comment Task succeed");
             } else {
+                Toast.makeText(getApplicationContext(), "评价失败", Toast.LENGTH_LONG).show();
                 System.out.println("Comment Task Failed");
             }
-            Refresh();
+
         }
 
         @Override
@@ -1238,13 +1294,15 @@ public class TaskInfoDetailActivity extends Activity {
 
         @Override
         protected void onPostExecute(final Boolean success) {
-            Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
+            //Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
             if (success) {
+                Toast.makeText(getApplicationContext(), "删除任务条目成功", Toast.LENGTH_LONG).show();
                 System.out.println("RemoveTaskAction succeed");
+                Refresh();
             } else {
+                Toast.makeText(getApplicationContext(), "删除任务条目失败", Toast.LENGTH_LONG).show();
                 System.out.println("Remove Task Action Failed!");
             }
-            Refresh();
         }
 
         @Override
@@ -1307,12 +1365,13 @@ public class TaskInfoDetailActivity extends Activity {
 
         @Override
         protected void onPostExecute(final Boolean success) {
-            Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
+            //Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
             if (success) {
                 System.out.println("Remove Task succeed");
                 setResult(RESULT_OK);
                 finish();
             } else {
+                Toast.makeText(getApplicationContext(), "删除任务失败", Toast.LENGTH_LONG).show();
                 System.out.println("Remove Task Failed!");
             }
         }
@@ -1377,18 +1436,14 @@ public class TaskInfoDetailActivity extends Activity {
 
         @Override
         protected void onPostExecute(final Boolean success) {
-            Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
             if (success) {
+                Toast.makeText(getApplicationContext(), "领取成功", Toast.LENGTH_LONG).show();
                 System.out.println("Response Task succeed");
+                Refresh();
             } else {
+                Toast.makeText(getApplicationContext(), "领取失败", Toast.LENGTH_LONG).show();
                 System.out.println("Response Task Failed");
             }
-            Refresh();
-        }
-
-        @Override
-        protected void onCancelled() {
-            //mResponsetaskTask = null;
         }
     }
 
@@ -1448,13 +1503,16 @@ public class TaskInfoDetailActivity extends Activity {
 
         @Override
         protected void onPostExecute(final Boolean success) {
-            Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
+            //Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
             if (success) {
+                Toast.makeText(getApplicationContext(), "指派成功", Toast.LENGTH_LONG).show();
+                Refresh();
                 System.out.println("Select Task Executor succeed");
             } else {
+                Toast.makeText(getApplicationContext(), "指派失败", Toast.LENGTH_LONG).show();
                 System.out.println("Select Task Executor Failed");
             }
-            Refresh();
+
         }
 
         @Override
@@ -1462,7 +1520,6 @@ public class TaskInfoDetailActivity extends Activity {
             //mSelectTaskExecutorTask = null;
         }
     }
-
 
     /*
 根据任务的pk号查找属于这个任务的任务条目并列出
@@ -1516,16 +1573,12 @@ public class TaskInfoDetailActivity extends Activity {
                 result = "FAILED: " + e.toString();
                 return false;
             }
-            if (result.indexOf("FAILED") >= 0)
-                return false;
-            else
-                return true;
+            return result.indexOf("FAILED") < 0;
         }
 
         @Override
         protected void onPostExecute(final Boolean success) {
             if (success) {
-                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 try {
                     ((TaskActionListAdapter) actionList.getAdapter()).clear();
                     JSONArray jsonArray = new JSONArray(result);
@@ -1550,20 +1603,14 @@ public class TaskInfoDetailActivity extends Activity {
                 } catch (Exception ejson) {
                     System.out.println("Get Task Action:解析JSON异常" + ejson);
                 }
-
                 System.out.println("Get Task Action succeed");
-
             } else {
-                Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "获取任务条目失败", Toast.LENGTH_LONG).show();
                 System.out.println("Get Task Action Failed!");
             }
         }
 
-        @Override
-        protected void onCancelled() {
-            //mGetTaskActionTask = null;
-        }
-
     }
+
 
 }

@@ -224,69 +224,63 @@
                 android:layout_weight="0.5"
                 android:textSize="16sp" />
         </LinearLayout>
-        <View
-            android:id="@+id/div_tab_bar2"
+
+        <LinearLayout
+            android:id="@+id/linearLayout"
             android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:layout_below="@id/detail"
-            android:background="@drawable/divide_bar" />
-
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/detail"
-        android:orientation="horizontal"
-        android:paddingBottom="10dp"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp"
-        android:paddingTop="10dp">
-
-        <TextView
-            android:id="@+id/textView9"
-            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:text="发布任务数量"
-            android:textSize="16sp" />
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/detail"
+            android:orientation="horizontal"
+            android:paddingBottom="10dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingTop="10dp">
 
-        <TextView
-            android:id="@+id/post_task_num"
-            android:layout_width="0dp"
+            <TextView
+                android:id="@+id/textView9"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:text="发布任务数量"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/post_task_num"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:textSize="16sp" />
-    </LinearLayout>
+            android:layout_alignLeft="@+id/linearLayout"
+            android:layout_below="@+id/linearLayout"
+            android:orientation="horizontal"
+            android:paddingBottom="10dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingTop="10dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/linearLayout"
-        android:layout_below="@+id/linearLayout"
-        android:orientation="horizontal"
-        android:paddingBottom="10dp"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp"
-        android:paddingTop="10dp">
+            <TextView
+                android:id="@+id/textView11"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:text="完成任务数量"
+                android:textSize="16sp" />
 
-        <TextView
-            android:id="@+id/textView11"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:text="完成任务数量"
-            android:textSize="16sp" />
+            <TextView
+                android:id="@+id/finish_task_num"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:textSize="16sp" />
+        </LinearLayout>
 
-        <TextView
-            android:id="@+id/finish_task_num"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:textSize="16sp" />
+
     </LinearLayout>
 
 
