@@ -1,15 +1,19 @@
 package com.example.errand.errand;
 
+import android.app.Fragment;
 import android.app.ListFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -83,6 +87,7 @@ public class TaskListFragment extends ListFragment {
     private void showToast(String content) {
         Toast.makeText(getActivity().getApplicationContext(), content, Toast.LENGTH_LONG).show();
     }
+
 
     private class BrowseAllTasks extends AsyncTask<Void, Void, String> {
         private final Integer lastPk;

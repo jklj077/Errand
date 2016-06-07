@@ -16,17 +16,20 @@
         android:layout_centerHorizontal="true"
         android:gravity="center_vertical|center_horizontal"
         android:background="#91dadf" />
-<com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_below="@+id/healine"
-    android:id="@+id/tasklist_refresh"
-    app:direction="both">
-        <ListView
+
+
+    <com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@id/android:list"/>
-</com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout>
+        android:layout_below="@+id/healine"
+        android:id="@+id/tasklist_refresh"
+        app:direction="both">
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@id/android:list"/>
+    </com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout>
+
 
 
 </RelativeLayout>

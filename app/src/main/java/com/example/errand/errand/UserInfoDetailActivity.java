@@ -107,13 +107,13 @@ public class UserInfoDetailActivity extends Activity {
         }
 
         @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            String param = "nickname=" + mNickname + "&" + "sex=" + mSex + "&" + "phone_number=" + mPhone_number + "&" + "birthday=" + mBirthday + "&" + "signature=" + mSignature;
-            Log.d("a", param);
-        }
+      //  protected void onPreExecute() {
+       //     super.onPreExecute();
+       //     String param = "nickname=" + mNickname + "&" + "sex=" + mSex + "&" + "phone_number=" + mPhone_number + "&" + "birthday=" + mBirthday + "&" + "signature=" + mSignature;
+       //     Log.d("a", param);
+      //  }
 
-        @Override
+     //   @Override
         protected Boolean doInBackground(Void... params) {
             String strUrl = "http://139.129.47.180:8002/Errand/changeuserinfo";
             URL Url = null;
