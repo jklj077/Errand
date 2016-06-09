@@ -155,6 +155,8 @@ public class UserInfoDetailActivity extends Activity {
             confirm.setVisibility(View.GONE);
             nickname.setClickable(false);
             nickname.setEnabled(false);
+            bst.setClickable(false);
+            bst.setEnabled(false);
             sex.setClickable(false);
             sex.setEnabled(false);
             birth.setClickable(false);

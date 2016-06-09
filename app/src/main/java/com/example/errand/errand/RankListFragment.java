@@ -81,14 +81,14 @@ public class RankListFragment extends Fragment {
                 task3.execute();
             }
         });
-        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+       /* listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
               //  UserGetUserProfileTask task4 = new UserGetUserProfileTask();
                 Intent intent = new Intent(getActivity(), UserInfoDetailActivity.class);
                 startActivityForResult(intent,0);
             }
-        });
+        });*/
         return view;
     }
 
