@@ -8,7 +8,6 @@ package com.example.errand.errand;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
-
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
@@ -18,11 +17,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView rank;
     private TextView info;
 
-    private TaskListFragment frame_list;
-    private RankListFragment frame_rank;
-    private UserInfoFragment frame_info;
     private FragmentManager framemanager;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,46 +45,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         info.setSelected(false);
     }
 
-    private void hideAllFragment(FragmentTransaction fragmentTransaction) {
-        if (frame_list != null) fragmentTransaction.hide(frame_list);
-        if (frame_rank != null) fragmentTransaction.hide(frame_rank);
-        if (frame_info != null) fragmentTransaction.hide(frame_info);
-    }
-
     @Override
     public void onClick(View v) {
         FragmentTransaction fTransaction = framemanager.beginTransaction();
-        hideAllFragment(fTransaction);
         switch (v.getId()) {
             case R.id.list:
                 setSelected();
                 list.setSelected(true);
-                if (frame_list == null) {
-                    frame_list = new TaskListFragment();
-                    fTransaction.add(R.id.content, frame_list);
-                } else {
-                    fTransaction.show(frame_list);
-                }
+                fTransaction.replace(R.id.content, new TaskListFragment());
                 break;
             case R.id.rank:
                 setSelected();
                 rank.setSelected(true);
-                if (frame_rank == null) {
-                    frame_rank = new RankListFragment();
-                    fTransaction.add(R.id.content, frame_rank);
-                } else {
-                    fTransaction.show(frame_rank);
-                }
+                fTransaction.replace(R.id.content, new RankListFragment());
                 break;
             case R.id.info:
                 setSelected();
                 info.setSelected(true);
-                if (frame_info == null) {
-                    frame_info = new UserInfoFragment();
-                    fTransaction.add(R.id.content, frame_info);
-                } else {
-                    fTransaction.show(frame_info);
-                }
+                fTransaction.replace(R.id.content, new UserInfoFragment());
                 break;
         }
         fTransaction.commit();

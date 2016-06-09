@@ -135,8 +135,18 @@ public class LoginActivity extends Activity {
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        CookieHandler.setDefault(new CookieManager());
-        new GetKey().execute();
+        if (CookieHandler.getDefault() == null) {
+            app.key = null;
+            CookieHandler.setDefault(new CookieManager());
+            new GetKey().execute();
+        } else {
+            SharedPreferences UserPassport = getSharedPreferences("User", MODE_PRIVATE);
+            String savedUsername = UserPassport.getString("username", null);
+            String savedPassword = UserPassport.getString("password", null);
+            if (savedUsername != null && savedPassword != null) {
+                new UserLogin(savedUsername, savedPassword).execute();
+            }
+        }
     }
 
     private void setLoad(boolean load) {

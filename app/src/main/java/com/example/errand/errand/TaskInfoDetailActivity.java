@@ -449,28 +449,28 @@ public class TaskInfoDetailActivity extends Activity {
         });
     }
 
-    private void enableComment(boolean show, boolean editable) {
+    private void enableComment(boolean show, boolean editable, boolean ischange) {
         commentLayout.setVisibility(show ? View.VISIBLE : View.GONE);
-        comment.setOnClickListener(!editable ? null : new View.OnClickListener() {
+        comment.setOnClickListener(!editable ? null : (!ischange ? new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(TaskInfoDetailActivity.this);
                 builder.setTitle("Comment");
                 LinearLayout content = new LinearLayout(getApplicationContext());
                 content.setOrientation(LinearLayout.VERTICAL);
-                final TextInputEditText comment = new TextInputEditText(getApplicationContext());
+                final TextInputEditText comment = new TextInputEditText(TaskInfoDetailActivity.this);
                 comment.setTextColor(Color.BLACK);
                 comment.setInputType(InputType.TYPE_TEXT_FLAG_IME_MULTI_LINE);
                 comment.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-                final TextInputLayout inputLayout = new TextInputLayout(getApplicationContext());
+                final TextInputLayout inputLayout = new TextInputLayout(TaskInfoDetailActivity.this);
                 inputLayout.setHint("评价");
                 inputLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
                 inputLayout.addView(comment);
-                final RatingBar ratingBar = new RatingBar(getApplicationContext());
+                final RatingBar ratingBar = new RatingBar(TaskInfoDetailActivity.this);
                 ratingBar.setStepSize(1);
                 ratingBar.setNumStars(5);
                 ratingBar.setMax(5);
-                ratingBar.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                ratingBar.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
                 content.addView(ratingBar);
                 content.addView(inputLayout);
                 builder.setView(content);
@@ -486,7 +486,44 @@ public class TaskInfoDetailActivity extends Activity {
                 AlertDialog dialog = builder.create();
                 dialog.show();
             }
-        });
+        } : new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(TaskInfoDetailActivity.this);
+                builder.setTitle("Change Comment");
+                LinearLayout content = new LinearLayout(TaskInfoDetailActivity.this);
+                content.setOrientation(LinearLayout.VERTICAL);
+                final TextInputEditText comment = new TextInputEditText(TaskInfoDetailActivity.this);
+                comment.setTextColor(Color.BLACK);
+                comment.setInputType(InputType.TYPE_TEXT_FLAG_IME_MULTI_LINE);
+                comment.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                comment.setText(taskInfo.comment);
+                final TextInputLayout inputLayout = new TextInputLayout(TaskInfoDetailActivity.this);
+                inputLayout.setHint("评价");
+                inputLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                inputLayout.addView(comment);
+                final RatingBar ratingBar = new RatingBar(TaskInfoDetailActivity.this);
+                ratingBar.setStepSize(1);
+                ratingBar.setNumStars(5);
+                ratingBar.setMax(5);
+                ratingBar.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                ratingBar.setRating((float) taskInfo.score);
+                content.addView(ratingBar);
+                content.addView(inputLayout);
+                builder.setView(content);
+                builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String com = comment.getText().toString();
+                        String score = Integer.toString((int) ratingBar.getRating());
+                        new UserCommenttaskTask(Integer.toString(pk), score, com).execute();
+                    }
+                });
+                builder.setNegativeButton("Cancel", null);
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        }));
     }
 
     @Override
@@ -583,6 +620,7 @@ public class TaskInfoDetailActivity extends Activity {
             ViewHolder vh = new ViewHolder(v, username);
             return vh;
         }
+
 
         public void onBindViewHolder(ViewHolder holder, int position) {
             holder.username.setText(takers.get(position));
@@ -692,14 +730,14 @@ public class TaskInfoDetailActivity extends Activity {
                     headline.setText(taskInfo.headline);
                     if (taskInfo.status.equals("A")) {
                         status.setText("已指派");
-                        enableComment(false, false);
+                        enableComment(false, false, false);
                         enableDelete(false);
                         enableEdit(false);
                         setConfirm(isMine);
                         showExecutor(true);
                     } else if (taskInfo.status.equals("W")) {
                         status.setText("待指派");
-                        enableComment(false, false);
+                        enableComment(false, false, false);
                         showExecutor(false);
                         setConfirm(!isMine && !taskInfo.takers.contains(app.username));
                         if (taskInfo.takers.size() == 0) {
@@ -711,12 +749,12 @@ public class TaskInfoDetailActivity extends Activity {
                         }
                     } else if (taskInfo.status.equals("C")) {
                         status.setText("已结束");
-                        if (taskInfo.executor.isEmpty()) {
+                        if (taskInfo.executor == "null") {
                             showExecutor(false);
-                            enableComment(false, false);
+                            enableComment(false, false, false);
                         } else {
                             showExecutor(true);
-                            enableComment(true, taskInfo.comment.isEmpty());
+                            enableComment(true, true, !taskInfo.score.equals(-1));
                         }
                         enableDelete(true);
                         enableEdit(false);
@@ -727,9 +765,11 @@ public class TaskInfoDetailActivity extends Activity {
                     comment.setText(taskInfo.comment);
                     executorUsername.setText(taskInfo.executor);
                     takers.clear();
+                    takerAdapter.notifyDataSetChanged();
                     for (String taker : taskInfo.takers) {
                         takers.add(taker);
                     }
+                    takerAdapter.notifyDataSetChanged();
                 } catch (Exception eJson) {
                     Toast.makeText(getApplicationContext(), "ERROR: "+eJson.toString(), Toast.LENGTH_LONG).show();
                 }

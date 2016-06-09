@@ -138,8 +138,8 @@ public class TaskListFragment extends ListFragment {
 
     private class BrowseAllTasks extends AsyncTask<Void, Void, String> {
         private final Integer lastPk;
-        private boolean isRefresh;
         private final SwipyRefreshLayoutDirection direction;
+        private boolean isRefresh;
 
         public BrowseAllTasks(Integer pk, SwipyRefreshLayoutDirection direction){
             if(direction == SwipyRefreshLayoutDirection.TOP) {
@@ -245,6 +245,9 @@ public class TaskListFragment extends ListFragment {
         private final String mInfo;
         private final SwipyRefreshLayoutDirection direction;
         private final boolean isRefresh;
+        PrintWriter out = null;
+        BufferedReader in = null;
+        String result = "";
         private int pk;//这个是查找到的任务的pk号，注意区分
         private String create_account;
         private String create_time;
@@ -256,9 +259,6 @@ public class TaskListFragment extends ListFragment {
         private String headline;
         private String detail;
         private String reward;
-        PrintWriter out = null;
-        BufferedReader in = null;
-        String result = "";
 
 
         UserSearchtaskTask(String pk, String info, SwipyRefreshLayoutDirection direction) {
@@ -318,10 +318,7 @@ public class TaskListFragment extends ListFragment {
                 //logger.catching(e);
                 return false;
             }
-            if (result.indexOf("[]") >= 0)
-                return false;
-            else
-                return true;
+            return result.indexOf("[]") < 0;
         }
 
         @Override
@@ -395,8 +392,8 @@ public class TaskListFragment extends ListFragment {
             LinearLayout taskItemView;
             TaskInfo task = getItem(position);
             if(convertView == null){
-                taskItemView = new LinearLayout(getContext());
-                LayoutInflater inflater = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                taskItemView = new LinearLayout(getActivity());
+                LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 inflater.inflate(resource, taskItemView, true);
             }else{
                 taskItemView = (LinearLayout)convertView;
