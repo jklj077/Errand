@@ -8,18 +8,38 @@
 package com.example.errand.errand;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.support.design.widget.TextInputEditText;
+import android.support.design.widget.TextInputLayout;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.TimePicker;
+
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -29,6 +49,11 @@ import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
+import static android.app.AlertDialog.*;
+import static com.example.errand.errand.TaskInfoDetailActivity.disableEditText;
 
 public class UserInfoDetailActivity extends Activity {
     private TextView back;
@@ -43,8 +68,15 @@ public class UserInfoDetailActivity extends Activity {
     private TextView finish_num;
     private RatingBar rating;
     private Errand app;
+    private Calendar birthtime;
+    private SimpleDateFormat format;
     private UserInfoChangeActivity.UserChangeInfoTask mChangeUserInfoTask;
     private UserInfoChangeActivity.UserChangePasswordTask mChangePasswordTask;
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +85,7 @@ public class UserInfoDetailActivity extends Activity {
         setContentView(R.layout.activity_user_info);
         String user = getIntent().getStringExtra("username");
         //Log.d("ERRAND", taskinfo.mPhone_number);
-
+        format = new SimpleDateFormat("yyyy-MM-dd");
         post_num = (TextView) findViewById(R.id.post_task_num);
         finish_num = (TextView) findViewById(R.id.finish_task_num);
         rating = (RatingBar) findViewById(R.id.ratingBar);
@@ -66,12 +98,26 @@ public class UserInfoDetailActivity extends Activity {
 
         sex = (EditText) findViewById(R.id.sex);
 
-        birth = (EditText) findViewById(R.id.birth);
-
         nickname = (EditText) findViewById(R.id.nickname);
-
-
-
+        birth = (EditText) findViewById(R.id.birth);
+        birth.setClickable(false);
+        birth.setFocusable(false);
+        birth.setFocusableInTouchMode(false);
+        TextView bst = (TextView) findViewById(R.id.b_st);
+        bst.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Calendar currentDate = Calendar.getInstance();
+                birthtime = Calendar.getInstance();
+                new TaskInfoDetailActivity.MyDatePickDialog(UserInfoDetailActivity.this, new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                        birthtime.set(year, monthOfYear, dayOfMonth);
+                        birth.setText(format.format(birthtime.getTime()));
+                    }
+                }, currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DAY_OF_MONTH)).show();
+            }
+        });
         back = (TextView) findViewById(R.id.back);
         back.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,13 +134,13 @@ public class UserInfoDetailActivity extends Activity {
                 String mphone = ((EditText) findViewById(R.id.phone)).getText().toString();
                 String mnickname = ((EditText) findViewById(R.id.nickname)).getText().toString();
                 Log.d("ERRAND", mnickname);
-                String msign = ((EditText)findViewById(R.id.sign)).getText().toString();
-                String msex =  ((EditText)findViewById(R.id.sex)).getText().toString();
-                String mbirth =  ((EditText)findViewById(R.id.birth)).getText().toString();
+                String msign = ((EditText) findViewById(R.id.sign)).getText().toString();
+                String msex = ((EditText) findViewById(R.id.sex)).getText().toString();
+                String mbirth = ((EditText) findViewById(R.id.birth)).getText().toString();
 
                 Log.d("ERRAND", "BEFORE START");
 
-                UserChangeInfoTask task = new UserChangeInfoTask(mnickname,msex, mphone,mbirth, msign);
+                UserChangeInfoTask task = new UserChangeInfoTask(mnickname, msex, mphone, mbirth, msign);
                 task.execute();
                 Intent intent = getIntent();
                 Bundle bundle = new Bundle();
@@ -103,7 +149,10 @@ public class UserInfoDetailActivity extends Activity {
                 finish();
             }
         });
-        if(!app.username.equals(user) && user != null){
+        if (!app.username.equals(user) && user != null) {
+            confirm.setClickable(false);
+            confirm.setEnabled(false);
+            confirm.setVisibility(View.GONE);
             nickname.setClickable(false);
             nickname.setEnabled(false);
             sex.setClickable(false);
@@ -117,14 +166,58 @@ public class UserInfoDetailActivity extends Activity {
 
             new UserGetUserProfileTask(user).execute();
 
-        }
-        else {
+        } else {
             UserGetInfoTask taskinfo = new UserGetInfoTask();
             taskinfo.execute();
             new UserGetUserProfileTask(app.username).execute();
         }
 
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "UserInfoDetail Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app URL is correct.
+                Uri.parse("android-app://com.example.errand.errand/http/host/path")
+        );
+        AppIndex.AppIndexApi.start(client, viewAction);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "UserInfoDetail Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app URL is correct.
+                Uri.parse("android-app://com.example.errand.errand/http/host/path")
+        );
+        AppIndex.AppIndexApi.end(client, viewAction);
+        client.disconnect();
+    }
+
     /*
     修改用户信息类
     */
@@ -148,13 +241,13 @@ public class UserInfoDetailActivity extends Activity {
         }
 
         @Override
-      //  protected void onPreExecute() {
-       //     super.onPreExecute();
-       //     String param = "nickname=" + mNickname + "&" + "sex=" + mSex + "&" + "phone_number=" + mPhone_number + "&" + "birthday=" + mBirthday + "&" + "signature=" + mSignature;
-       //     Log.d("a", param);
-      //  }
+        //  protected void onPreExecute() {
+        //     super.onPreExecute();
+        //     String param = "nickname=" + mNickname + "&" + "sex=" + mSex + "&" + "phone_number=" + mPhone_number + "&" + "birthday=" + mBirthday + "&" + "signature=" + mSignature;
+        //     Log.d("a", param);
+        //  }
 
-     //   @Override
+        //   @Override
         protected Boolean doInBackground(Void... params) {
             String strUrl = "http://139.129.47.180:8002/Errand/changeuserinfo";
             URL Url = null;
@@ -212,6 +305,7 @@ public class UserInfoDetailActivity extends Activity {
             mChangeUserInfoTask = null;
         }
     }
+
     /*
         获取用户信息类
 
@@ -285,13 +379,13 @@ public class UserInfoDetailActivity extends Activity {
                     System.out.println("signature = " + mSignature);
                     System.out.println("Get My User Info succeed");
                     phone.setText(mPhone_number);
-                    sign = (EditText)findViewById(R.id.sign);
+                    sign = (EditText) findViewById(R.id.sign);
                     sign.setText(mSignature);
-                    sex = (EditText)findViewById(R.id.sex);
+                    sex = (EditText) findViewById(R.id.sex);
                     sex.setText(mSex);
-                    birth = (EditText)findViewById(R.id.birth);
+                    birth = (EditText) findViewById(R.id.birth);
                     birth.setText(mBirthday);
-                    nickname = (EditText)findViewById(R.id.nickname);
+                    nickname = (EditText) findViewById(R.id.nickname);
                     nickname.setText(mNickname);
                 } catch (Exception Ejson) {
                     System.out.println("analyze failed: " + Ejson);
@@ -392,13 +486,13 @@ public class UserInfoDetailActivity extends Activity {
                     System.out.println("Get User Profile Succeed");
                     phone = (EditText) findViewById(R.id.phone);
                     phone.setText(phone_number);
-                    sign = (EditText)findViewById(R.id.sign);
+                    sign = (EditText) findViewById(R.id.sign);
                     sign.setText(zsignature);
-                    sex = (EditText)findViewById(R.id.sex);
+                    sex = (EditText) findViewById(R.id.sex);
                     sex.setText(zsex);
-                    birth = (EditText)findViewById(R.id.birth);
+                    birth = (EditText) findViewById(R.id.birth);
                     birth.setText(zbirthday);
-                    nickname = (EditText)findViewById(R.id.nickname);
+                    nickname = (EditText) findViewById(R.id.nickname);
                     nickname.setText(znickname);
                     post_num.setText(String.valueOf(taskCreated));
                     finish_num.setText(String.valueOf(taskCompleted));
