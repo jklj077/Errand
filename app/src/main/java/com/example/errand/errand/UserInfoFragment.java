@@ -390,7 +390,7 @@ public class UserInfoFragment extends Fragment {
                 }
 
             } else {
-                Toast.makeText(getContext(), "创建任务失败", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "创建任务失败", Toast.LENGTH_LONG).show();
                 System.out.println("Add Task Failed");
             }
         }
@@ -466,7 +466,7 @@ public class UserInfoFragment extends Fragment {
 
         @Override
         protected void onPostExecute(final Boolean success) {
-            //Toast.makeText(getContext(), result, Toast.LENGTH_LONG).show();
+            //Toast.makeText(getActivity(), result, Toast.LENGTH_LONG).show();
             if (success) {
                 try {
                     JSONArray jsonArray = new JSONArray(result);
@@ -492,12 +492,12 @@ public class UserInfoFragment extends Fragment {
                     startActivityForResult(intent, 0);
                 } catch (Exception ejson) {
                     System.out.println("Add Task Action:解析JSON异常" + ejson);
-                    Toast.makeText(getContext(), "创建任务部分失败", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), "创建任务部分失败", Toast.LENGTH_LONG).show();
                 }
                 System.out.println("Add Task Action succeed");
             } else {
                 new UserRemovetaskTask(mPk).execute();
-                Toast.makeText(getContext(), "创建任务失败", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "创建任务失败", Toast.LENGTH_LONG).show();
                 System.out.println("Add Task Action Failed!");
             }
         }
@@ -562,7 +562,7 @@ public class UserInfoFragment extends Fragment {
             if (success) {
                 System.out.println("Remove Task succeed");
             } else {
-                Toast.makeText(getContext(), "内部错误，您的任务将自动关闭", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "内部错误，您的任务将自动关闭", Toast.LENGTH_LONG).show();
                 System.out.println("Remove Task Failed!");
             }
         }
