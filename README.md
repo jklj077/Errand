@@ -1,5 +1,6 @@
-# Errand
+# Errand: A platform for doing errands and getting your errands done
 
-project of Software Engineering
-
-in active developing
+course project for Software Engineering
+this is an application for android
+server side is elsewhere
+development stopped
